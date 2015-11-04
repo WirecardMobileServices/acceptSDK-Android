@@ -16,7 +16,7 @@ There are two ways how to install the SDK.
 1. Clone from GitHub and integrate the library to your project
 2. acceptSDK is available through gradle dependency
 ```
-compile 'de.wirecard.accept.sdk:accept-sdk-android-acceptsdksource:1.3.6.0@aar'
+compile 'com.github.mposSVK:acceptSDK-Android:1.4.8@aar'
 ```
 ## Contact
 Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com/ "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
