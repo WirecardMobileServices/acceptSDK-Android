@@ -34,7 +34,7 @@ If using accepdSDK pod the all the required libraries are taken care of by the g
 	* BBPOS [uEMV Swiper - Chipper](http://bbpos.com/en/solutions/hardware/ "Chipper")
 	* Spire [PosMate](http://www.spirepayments.com/product/posmate/ "PosMate")
 	* Spire [SPm2](http://www.spirepayments.com/product/spm2/ "SPm2")
-	* Datecs printer [DPP-250](http://www.datecs.bg/en/products/DPP-250/2/175 "DPP-250")
+	* Datecs printer [DPP-250](http://www.datecs.bg/en/products/61 "DPP-250")
 
 ## Authors
 
