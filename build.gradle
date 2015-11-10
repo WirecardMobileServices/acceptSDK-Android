@@ -1,0 +1,16 @@
+apply plugin: 'maven'
+
+group='com.github.mposSVK'
+version='release'
+
+artifacts {
+  archives new File('accept-sdk-android-acceptsdksource-release.aar')
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      repository(url: mavenLocal().url)
+    }
+  }
+}
