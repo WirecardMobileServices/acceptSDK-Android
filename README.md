@@ -12,7 +12,18 @@ accept GER|Lexware pay|Accept SGP|M1 mPOS|
 Wirecard Technologies is using the acceptSDK in their Whitelabel application which is fully integrated professional mPOS solution. The Whitelabel app is VISA and Mastercard certified and utilises the Wirecard infrastructure for card payment processing.
 
 ## Installation
-Download from GitHub and integrate the library to your project
+There are two ways how to install the SDK.
+1. Clone from GitHub and integrate the library to your project as per accept SDK - Quick Start Guide.
+2. acceptSDK is available through gradle dependency
+```
+repositories {
+	maven { url "https://jitpack.io" }
+}
+
+dependencies {
+	compile 'de.wirecard.accept.sdk:accept-sdk-android-acceptsdksource:1.3.6.0@aar'
+}
+```
 
 ## Contact
 Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com/ "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
