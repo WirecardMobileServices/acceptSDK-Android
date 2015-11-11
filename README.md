@@ -15,7 +15,6 @@ Wirecard Technologies is using the acceptSDK in their Whitelabel application whi
 There are two ways how to install the SDK.
 
 1. Clone from GitHub and integrate the library to your project as per accept SDK - Quick Start Guide.
-2. 
 2. acceptSDK is available through gradle dependency
 ```
 repositories {
