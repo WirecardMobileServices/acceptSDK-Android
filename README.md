@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-	compile 'de.wirecard.accept.sdk:accept-sdk-android-acceptsdksource:1.3.6.0@aar'
+	compile 'com.github.mposSVK:acceptSDK-Android:v1.4.8'
 }
 ```
 
