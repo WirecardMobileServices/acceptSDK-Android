@@ -27,9 +27,9 @@ dependencies {
 ```
 
 ## Contact
-Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com/ "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
+Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
 
-Get in touch with [Wirecard mPOS retail team](mailto://retail.mpos@wirecard.com/ "mpor Retails") for Wirecard payment processing services
+Get in touch with [Wirecard mPOS retail team](mailto://retail.mpos@wirecard.com  "mpos Retails") for Wirecard payment processing services
 
 ## Documentation
 
