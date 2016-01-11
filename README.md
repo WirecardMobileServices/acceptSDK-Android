@@ -7,7 +7,7 @@ The library enables cashless payment processing with selected mPOS terminals (ma
 
 Check out the applications using the **acceptSDK** and created as **re-branding** of **Wirecard Whitelabel solution** 
 
-accept GER|Lexware pay|Accept SGP|M1 mPOS|
+accept GER|Lexware pay|accept SGP|M1 mPOS|
 -------|-----------|-------|------|
 [<img style="border-radius: 25px;" src="https://lh3.googleusercontent.com/Mlm08oH9l4e-Q-QO-FQiIZaVPXo4CDNAzxZGLWR46iTWCwCmDsO4mp8Uru5tYB0LyGvF=w300-rw" alt="Accept GER" width=100 height=100>](https://play.google.com/store/apps/details?id=de.wirecard.accept.de "Accept GER")|[<img style="border-radius: 25px;" src="https://lh3.googleusercontent.com/yMuOKlGiCeNNmf5AKe87CqDX2QETD6dl8uBgU04ZvVlpHZqjSoxTqMLnjjXpwasF8Nh-=w300-rw" width=100 height=100 alt="Lexware pay">](https://play.google.com/store/apps/details?id=de.wirecard.accept.lexware "Lexware pay")|[<img  style="border-radius: 25px;" src="https://lh3.googleusercontent.com/HtgJJ8HhiupQlz2TC1FXIPHR2mXYz0ZCngg4U0FOFJL3-UaHYmyXYCdBoVRjqIRXKio=w300-rw" width=100 height=100 alt="Accept SGP">](https://play.google.com/store/apps/details?id=de.wirecard.accept.sgp "Accept SGP")|[<img  style="border-radius: 25px;" src="https://lh3.googleusercontent.com/XkPySwvwqMmj03E2gHL4WgLlANfb4zq6XN5n0mq1BqVimPh4nslFccrIcVjs4oNYmw0=w300-rw" width=100 height=100 alt="M1 mPOS">](https://play.google.com/store/apps/details?id=de.wirecard.accept.m1 "M1 mPOS")|
 ## Whitelabel solution
@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.mposSVK:acceptSDK-Android:v1.4.8'
+	compile 'com.github.mposSVK:acceptSDK-Android:v1.4.9'
 }
 ```
 
@@ -37,7 +37,7 @@ Get in touch with [Wirecard mPOS retail team](mailto://retail.mpos@wirecard.com 
 
 All the necessary documents are available in the ./docs subfolder.
 
-Refer to "Android Accept SDK - Quick Start Guide.docx" for the details on how to use acceptSDK.
+Refer to "Android Accept SDK - Quick Start Guide.pdf" for the details on how to use acceptSDK.
 
 If using accepdSDK pod the all the required libraries are taken care of by the gradle.
 
