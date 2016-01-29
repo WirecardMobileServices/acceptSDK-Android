@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="acceptsdk_debug" type="bool">true</item>
+    <item name="acceptsdk_certification_mode" type="bool">true</item>
+    <item name="acceptsdk_swiper_type" type="string"/>
+
+    <item name="acceptsdk_force_trustall_ssl" type="bool">true</item>
+    <item name="acceptsdk_terminal_type" type="string">ThyronExtension</item>
+    <item name="acceptsdk_support_contactless" type="bool">true</item>
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="manifest_app_name">Accept Sample App - Thyron</string>
+
+    <string name="acceptsdk_payment_activity_cancel_signature_confirmation_button">Cancel</string>
+    <string name="acceptsdk_payment_activity_cancel_button">Cancel</string>
+    <string name="acceptsdk_payment_activity_retry_button">Retry</string>
+    <string name="acceptsdk_payment_activity_confirm_signature_button">Confirm</string>
+
+    <string name="acceptsdk_dialog_payment_error_title">Transaction error</string>
+    <string name="acceptsdk_dialog_payment_error_message">Transaction rejected ( %s ).</string>
+    <string name="acceptsdk_dialog_payment_error_confirm">OK</string>
+
+    <string name="acceptsdk_dialog_signature_confirm_title">Signature check</string>
+    <string name="acceptsdk_dialog_signature_confirm_message">Please give the device to the merchant for signature confirmation. The merchant must confirm the signature pressing OK at the terminal.</string>
+    <string name="acceptsdk_dialog_signature_confirm_confirm">Is OK</string>
+    <string name="acceptsdk_dialog_signature_confirm_cancel">Cancel</string>
+
+    <string name="acceptsdk_dialog_signature_instruction_title">Signature check</string>
+    <string name="acceptsdk_dialog_signature_instruction_message">Please give this device to customer and ask to draw signature on device\'s screen.</string>
+    <string name="acceptsdk_dialog_signature_instruction_confirm">OK</string>
+    <string name="acceptsdk_dialog_signature_instruction_cancel">Cancel</string>
+
+    <string name="acceptsdk_dialog_terminal_chooser_title">Select terminal:</string>
+    <string name="acceptsdk_dialog_terminal_chooser_cancel">Cancel</string>
+
+    <string name="acceptsdk_dialog_no_terminals_title">No terminals</string>
+    <string name="acceptsdk_dialog_no_terminals_message">Please pair Posmate terminal with your device and try again later.</string>
+    <string name="acceptsdk_dialog_no_terminals_confirm">OK</string>
+
+    <string name="acceptsdk_dialog_cancel_signature_request_title">Signature</string>
+    <string name="acceptsdk_dialog_cancel_signature_request_message">Do you really want to cancel signature step. Please press YES to cancel.</string>
+    <string name="acceptsdk_dialog_cancel_signature_request_confirm">YES</string>
+    <string name="acceptsdk_dialog_cancel_signature_request_skip">NO</string>
+
+    <string name="acceptsdk_dialog_nothing_drawn_title">Signature</string>
+    <string name="acceptsdk_dialog_nothing_drawn_message">No signature entered. Please sign transaction and confirm again.</string>
+    <string name="acceptsdk_dialog_nothing_drawn_confirm">OK</string>
+
+    <string name="acceptsdk_dialog_discovery_error_title">Discovery error</string>
+    <string name="acceptsdk_dialog_discovery_error_message">Error occurred during terminals discovery ( %s ).</string>
+    <string name="acceptsdk_dialog_discovery_error_confirm">OK</string>
+
+    <string name="acceptsdk_progress__sucesful">Transaction approved.</string>
+    <string name="acceptsdk_progress__declined">Transaction rejected.</string>
+    <string name="acceptsdk_progress__searching">Searching for devices…</string>
+    <string name="acceptsdk_progress__connecting">Connecting to %s…</string>
+    <string name="acceptsdk_progress__terminal_configuration">Loading terminal configuration…</string>
+    <string name="acceptsdk_progress__firmware">Install</string>
+    <string name="acceptsdk_progress__ca_keys">Install</string>
+    <string name="acceptsdk_progress__online">Online processing…</string>
+    <string name="acceptsdk_progress__processing">Processing data…</string>
+    <string name="acceptsdk_progress__follow">Please follow instructions displayed on terminal</string>
+    <string name="acceptsdk_progress__confirm_amount">Confirm amount…</string>
+    <string name="acceptsdk_progress__tc_update">Sending transaction confirmation…</string>
+    <string name="acceptsdk_progress__enter_pin">Enter PIN…</string>
+    <string name="acceptsdk_progress__restart">Restart</string>
+    <string name="acceptsdk_progress__insert_or_swipe">Insert or swipe card…</string>
+    <string name="acceptsdk_progress__insert_swipe_or_tap">Insert swipe or present card…</string>
+    <string name="acceptsdk_progress__insert">Insert card…</string>
+    <string name="acceptsdk_progress__swipe">Swipe card…</string>
+    <string name="acceptsdk_progress__remove">Pleases remove card…</string>
+    <string name="acceptsdk_progress__customer_sign_request">Please sign here and confirm signature with CONFIRM button.</string>
+
+</resources>

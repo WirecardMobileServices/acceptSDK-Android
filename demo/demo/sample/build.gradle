@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    maven { url "https://jitpack.io" }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "21.1.2" //24.3.4
+    defaultConfig {
+        applicationId "de.wirecard.accept.sample"
+        minSdkVersion 11
+        targetSdkVersion 21
+        versionCode 3
+        versionName "1.2"
+    }
+    packagingOptions {
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/services/com.fasterxml.jackson.core.JsonFactory'
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        all {
+            def Properties appProps = new Properties()
+            try {
+                appProps.load(new FileInputStream(file("../../AcceptSDKAndroidDemo.properties")))
+            } catch (IOException e) {
+                appProps.put("clientID", System.getenv('BACKEND_DEFAULT_UID'))
+                appProps.put("clientSecret", System.getenv('BACKEND_DEFAULT_SECRET'))
+                appProps.put("apiPath", System.getenv('BACKEND_DEFAULT_URL'))
+            }
+            buildConfigField "String", "clientID", appProps.getProperty("clientID", "\"\"")
+            buildConfigField "String", "clientSecret", appProps.getProperty("clientSecret", "\"\"")
+            buildConfigField "String", "apiPath", appProps.getProperty("apiPath", "\"\"")
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(output.outputFile.parent, output.outputFile.name.replace(".apk", "-" + defaultConfig.versionName + ".apk"))
+        }
+    }
+    productFlavors {
+        flavor_bbpos {
+            applicationId 'de.wirecard.accept.sample.bbpos'
+        }
+        flavor_thyron {
+            applicationId 'de.wirecard.accept.sample.thyron'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
+    compile 'org.apache.httpcomponents:httpmime:4.3.5'
+    compile 'com.github.mposSVK:acceptSDK-Android:1.4.10'
+    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.4.10'
+    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.4.10'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+}

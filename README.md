@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.mposSVK:acceptSDK-Android:v1.4.9'
+	compile 'com.github.mposSVK:acceptSDK-Android:1.4.10'
 }
 ```
 
@@ -44,7 +44,6 @@ If using accepdSDK pod the all the required libraries are taken care of by the g
 ## Requirements
 * Device running Android > 3.0
 * One of Wirecard approved terminals and handheld printers
-	* IDTech [Unimag Pro](http://www.idtechproducts.com/products/mobile-readers/126.html "Unimag Pro")
 	* BBPOS [uEMV Swiper - Chipper](http://bbpos.com/en/solutions/hardware/ "Chipper")
 	* Spire [PosMate](http://www.spirepayments.com/product/posmate/ "PosMate")
 	* Spire [SPm2](http://www.spirepayments.com/product/spm2/ "SPm2")
@@ -53,14 +52,4 @@ If using accepdSDK pod the all the required libraries are taken care of by the g
 ## Authors
 
    Wirecard Technologies Slovakia,  mpos-svk@wirecard.com 
-   
-   marek.humenik, marek.humenik@wirecard.com
-   
-   patrik.misencik, patrik.misencik@wirecard.com
-   
-   marek.richter, marek.richter@wirecard.com
-   
-   damian.kolakowski, damian.kolakowski@partner.wirecard.com
-   
-
    

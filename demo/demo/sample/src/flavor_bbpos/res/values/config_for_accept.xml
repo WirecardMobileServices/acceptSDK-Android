@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="wl_default_terminal_type_use" type="string">bbPOSExtension</item>
+    <string-array name="extensions_list">
+        <item>bbPOSExtension</item>
+    </string-array>
+</resources>
