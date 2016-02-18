@@ -7,5 +7,4 @@
 
     <item name="acceptsdk_force_trustall_ssl" type="bool">true</item>
     <item name="acceptsdk_terminal_type" type="string">ThyronExtension</item>
-    <item name="acceptsdk_support_contactless" type="bool">true</item>
 </resources>

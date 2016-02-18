@@ -42,7 +42,7 @@ import de.wirecard.accept.sdk.util.CurrencyWrapper;
 import de.wirecard.accept.sdk.util.ReceiptBuilder;
 import de.wirecard.accept.sdk.util.TaxUtils;
 
-public class TransactionsHistoryActivity extends Activity {
+public class TransactionsHistoryActivity extends BaseActivity {
 
     private ListView listView;
     private View loading;

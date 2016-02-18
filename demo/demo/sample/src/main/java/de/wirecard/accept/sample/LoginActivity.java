@@ -19,7 +19,7 @@ import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.ApiResult;
 import de.wirecard.accept.sdk.OnRequestFinishedListener;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

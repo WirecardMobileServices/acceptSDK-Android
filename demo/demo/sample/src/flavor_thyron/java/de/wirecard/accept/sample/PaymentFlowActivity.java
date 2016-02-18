@@ -7,7 +7,7 @@ public class PaymentFlowActivity extends AbstractPaymentFlowActivity {
 
     @Override
     PaymentFlowController createNewController() {
-        return new AcceptThyronPaymentFlowController(false, true);
+        return new AcceptThyronPaymentFlowController(false);
     }
 
     @Override

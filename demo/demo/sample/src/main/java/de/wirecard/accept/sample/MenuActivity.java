@@ -15,7 +15,7 @@ import android.view.View;
 import de.wirecard.accept.sdk.AcceptSDK;
 
 
-public class MenuActivity extends Activity {
+public class MenuActivity extends BaseActivity {
 
     public static Intent intent(final Context context) {
         return new Intent(context, MenuActivity.class);

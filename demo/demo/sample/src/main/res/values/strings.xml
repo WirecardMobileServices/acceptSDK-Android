@@ -57,7 +57,6 @@
     <string name="acceptsdk_progress__enter_pin">Enter PIN…</string>
     <string name="acceptsdk_progress__restart">Restart</string>
     <string name="acceptsdk_progress__insert_or_swipe">Insert or swipe card…</string>
-    <string name="acceptsdk_progress__insert_swipe_or_tap">Insert swipe or present card…</string>
     <string name="acceptsdk_progress__insert">Insert card…</string>
     <string name="acceptsdk_progress__swipe">Swipe card…</string>
     <string name="acceptsdk_progress__remove">Pleases remove card…</string>

@@ -32,7 +32,7 @@ import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.Payment;
 import de.wirecard.accept.sdk.model.PaymentItem;
 
-public abstract class AbstractPaymentFlowActivity extends Activity implements PaymentFlowController.PaymentFlowDelegate {
+public abstract class AbstractPaymentFlowActivity extends BaseActivity implements PaymentFlowController.PaymentFlowDelegate {
 
     private PaymentFlowController paymentFlowController;
 
@@ -215,9 +215,6 @@ public abstract class AbstractPaymentFlowActivity extends Activity implements Pa
                 break;
             case WAITING_FOR_SWIPE:
                 showProgress(R.string.acceptsdk_progress__swipe, false);
-                break;
-            case WAITING_FOR_INSERT_SWIPE_OR_TAP:
-                showProgress(R.string.acceptsdk_progress__insert_swipe_or_tap, false);
                 break;
             case WAITING_FOR_PINT_ENTRY:
                 showProgress(R.string.acceptsdk_progress__enter_pin, false);
