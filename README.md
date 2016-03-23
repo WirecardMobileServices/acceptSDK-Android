@@ -28,7 +28,7 @@ dependencies {
 }
 ```
 
-## Extension compatybility table
+## Extension compatibility table
 SDK|Spire extension|BBPos extension|
 --------|--------|--------|
 1.4.10|1.4.10|1.4.10|
