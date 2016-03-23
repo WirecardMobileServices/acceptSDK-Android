@@ -3,4 +3,11 @@
  package="de.wirecard.accept.sample" >
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <application>
+        <activity
+            android:name=".FirmwareUpdateActivity"
+            android:configChanges="screenSize|screenLayout|orientation"
+            android:screenOrientation="portrait"/>
+    </application>
 </manifest>

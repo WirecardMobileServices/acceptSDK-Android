@@ -32,6 +32,9 @@ import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.Payment;
 import de.wirecard.accept.sdk.model.PaymentItem;
 
+/**
+ * Basin payment flow controlling activity
+ */
 public abstract class AbstractPaymentFlowActivity extends BaseActivity implements PaymentFlowController.PaymentFlowDelegate {
 
     private PaymentFlowController paymentFlowController;
@@ -95,6 +98,9 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         if ( !isDestroyed ) runOnUiThread(runnable);
     }
 
+    /**
+     * first step discovery devices
+     */
     private void proceedToDevicesDiscovery() {
         showProgress(R.string.acceptsdk_progress__searching, true);
         paymentFlowController.discoverDevices(this, new PaymentFlowController.DiscoverDelegate() {
@@ -159,6 +165,10 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         });
     }
 
+    /**
+     * second step: pay with discovered device
+     * @param device
+     */
     private void proceedToPayment(final PaymentFlowController.Device device) {
         signatureConfirmationDialog = null;
         final PaymentFlowSignatureView paymentFlowSignatureView = (PaymentFlowSignatureView)findViewById(R.id.signature);
@@ -170,10 +180,10 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         if(AcceptSDK.getPrefTaxArray().isEmpty())
             tax = 0f;
         else tax = AcceptSDK.getPrefTaxArray().get(0);
-        AcceptSDK.addPaymentItem(new PaymentItem(1, "", new BigDecimal(10.00), tax));
+        AcceptSDK.addPaymentItem(new PaymentItem(1, "", new BigDecimal("10.0"), tax));
 
         final Currency amountCurrency = Currency.getInstance(AcceptSDK.getCurrency());
-        final long amountUnits = AcceptSDK.getPaymentTotalAmount().longValue() * (int) Math.pow(10, amountCurrency.getDefaultFractionDigits());
+        final long amountUnits = AcceptSDK.getPaymentTotalAmount().scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();
 
         final TextView amountTextView = (TextView)findViewById(R.id.amount);
         amountTextView.setText(CurrencyUtils.format(amountUnits, amountCurrency, Locale.getDefault()));
@@ -265,6 +275,14 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         });
     }
 
+    /**
+     * In some cases  is needed signature as primary or additional cardholder verification method
+     *
+     * simple display view with drawing possibilities and "OK"-signature done / "Cancel"-cancel payment buttons
+     *
+     * @param signatureRequest
+     */
+
     @Override
     public void onSignatureRequested(final PaymentFlowController.SignatureRequest signatureRequest) {
         runOnUiThreadIfNotDestroyed(new Runnable() {
@@ -315,6 +333,13 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
 
     private Dialog signatureConfirmationDialog = null;
 
+
+    /**
+     * if used signature as verification method , seller have to check and compare signature on display and signature od back side of card
+     *
+     * we have to just display signature on screen
+     * @param signatureConfirmationRequest
+     */
     @Override
     public void onSignatureConfirmationRequested(final PaymentFlowController.SignatureConfirmationRequest signatureConfirmationRequest) {
         if ( signatureConfirmationDialog != null ) {
@@ -349,8 +374,6 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                         R.string.acceptsdk_progress__sucesful : R.string.acceptsdk_progress__declined));
                 findViewById(R.id.progress_section).setVisibility(View.GONE);
                 findViewById(R.id.signature_section).setVisibility(View.GONE);
-//                ((ImageView) findViewById(R.id.result_section)).setImageResource(success ?
-//                        R.drawable.acceptsdk_payment_activity_accepted_icon : R.drawable.acceptsdk_payment_activity_declined_icon);
             }
         });
     }

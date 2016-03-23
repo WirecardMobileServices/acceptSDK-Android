@@ -5,7 +5,6 @@
  */
 package de.wirecard.accept.sample;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -90,6 +89,7 @@ public class TransactionsHistoryActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 final Payment payment = (Payment) listView.getAdapter().getItem(position);
                 AlertDialog.Builder builder = new AlertDialog.Builder(TransactionsHistoryActivity.this);
+                //just simple way how to display data into the list
                 builder.setItems(menu, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -107,13 +107,17 @@ public class TransactionsHistoryActivity extends BaseActivity {
 
     }
 
+    /**
+     * presentation of sdk receipt building and data getting
+     * @param p
+     */
     private void showReceipt(Payment p) {
         MyStringBuilder sb = new MyStringBuilder(new StringBuilder());
         sb.append("Receipt number ");
         sb.appendWithNextLine(ReceiptBuilder.getReceiptNumber(p));
         sb.appendWithNextLine(new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss").format(new Date(ReceiptBuilder.getTransactionDate(p))));
         sb.append('\n');
-        appendMerchandInfo(sb);
+        appendMerchantInfo(sb);
         sb.append('\n');
         sb.appendWithNextLine("Payment items:");
         appendPaymentItems(sb, p);
@@ -146,7 +150,7 @@ public class TransactionsHistoryActivity extends BaseActivity {
         builder.show();
     }
 
-    private void appendMerchandInfo(MyStringBuilder sb) {
+    private void appendMerchantInfo(MyStringBuilder sb) {
         final String name = ReceiptBuilder.getMerchantNameAndSurname();
         final String address1 = ReceiptBuilder.getMerchantAddressLine1();
         final String address2 = ReceiptBuilder.getMerchantAddressLine2();

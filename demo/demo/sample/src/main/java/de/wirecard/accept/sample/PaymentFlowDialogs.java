@@ -74,11 +74,11 @@ public class PaymentFlowDialogs {
                         if (listener != null) listener.onSignatureRequestCancellationConfirmed();
                     }
                 }).setNegativeButton(R.string.acceptsdk_dialog_cancel_signature_request_skip, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (listener != null) listener.onSignatureRequestCancellationSkipped();
-                    }
-                }).create().show();
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (listener != null) listener.onSignatureRequestCancellationSkipped();
+            }
+        }).create().show();
     }
 
     public static Dialog showSignatureConfirmation(final Context context, Bitmap signature, boolean showButtons, final SignatureConfirmationListener listener) {

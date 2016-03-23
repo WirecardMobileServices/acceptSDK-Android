@@ -1,0 +1,50 @@
+package de.wirecard.accept.sample;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
+import de.wirecard.accept.sdk.AcceptSDK;
+
+/**
+ * @linc MenuActivity.java
+ */
+public abstract class AbstractMenuActivity extends BaseActivity {
+
+    public static Intent intent(final Context context) {
+        return new Intent(context, MenuActivity.class);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_menu);
+
+        findViewById(R.id.payment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(PaymentFlowActivity.intent(getApplicationContext()));
+            }
+        });
+
+
+        findViewById(R.id.history).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(TransactionsHistoryActivity.intent(getApplicationContext()));
+            }
+        });
+
+
+        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AcceptSDK.logout();
+                startActivity(new Intent(AbstractMenuActivity.this, LoginActivity.class));
+                finish();
+            }
+        });
+
+    }
+}

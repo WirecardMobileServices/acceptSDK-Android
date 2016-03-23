@@ -76,7 +76,7 @@ public class Application extends android.app.Application {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.e("Sesion Timeout", "sending Log Out");
+            Log.e("Session Timeout", "sending Log Out");
             sendLogoutIntentAndGoLogin();
         }
     }

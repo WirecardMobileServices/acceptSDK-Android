@@ -32,6 +32,9 @@ public class BaseActivity extends Activity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mLogoutReceiver);
     }
 
+    /**
+     * Receiver for "timeout" of server login session. After timeout You have to login again
+     */
     private final BroadcastReceiver mLogoutReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
