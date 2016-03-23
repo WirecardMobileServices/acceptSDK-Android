@@ -15,6 +15,6 @@ import android.view.View;
 import de.wirecard.accept.sdk.AcceptSDK;
 
 
-public class MenuActivity extends BaseActivity {
+public class MenuActivity extends AbstractMenuActivity {
 
 }
