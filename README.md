@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.mposSVK:acceptSDK-Android:1.5.4'
+	compile 'com.github.mposSVK:acceptSDK-Android:1.5.4.1'
 }
 ```
 
