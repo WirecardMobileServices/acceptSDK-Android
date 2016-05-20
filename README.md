@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.mposSVK:acceptSDK-Android:1.5.4.1'
+	compile 'com.github.mposSVK:acceptSDK-Android:1.5.5'
 }
 ```
 
@@ -33,6 +33,7 @@ SDK|Spire extension|BBPos extension|
 --------|--------|--------|
 1.4.10|1.4.10|1.4.10|
 1.5.4|1.5.3|1.5.1|
+1.5.5|1.5.4|1.5.1|
 
 ## Contact
 Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
