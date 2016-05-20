@@ -39,6 +39,8 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
 
     private PaymentFlowController paymentFlowController;
 
+    protected Boolean sepa = false;// used for
+
     public static Intent intent(final Context context) {
         return new Intent(context, PaymentFlowActivity.class);
     }
@@ -48,7 +50,13 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
+        final Bundle b = getIntent().getExtras();
+        if (b != null) {
+            sepa = b.getBoolean(BaseActivity.SEPA, false);
+        }
+
         paymentFlowController = createNewController();
+
         if(paymentFlowController == null)
             throw new IllegalArgumentException("You have to implement createNewController()");
 

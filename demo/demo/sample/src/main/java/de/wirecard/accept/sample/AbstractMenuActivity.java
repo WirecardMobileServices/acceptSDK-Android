@@ -28,6 +28,15 @@ public abstract class AbstractMenuActivity extends BaseActivity {
             }
         });
 
+        findViewById(R.id.sepa).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = PaymentFlowActivity.intent(getApplicationContext());
+                i.putExtra(BaseActivity.SEPA, true);
+                startActivity(i);
+            }
+        });
+
 
         findViewById(R.id.history).setOnClickListener(new View.OnClickListener() {
             @Override

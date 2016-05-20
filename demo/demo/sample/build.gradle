@@ -14,8 +14,8 @@ android {
         applicationId "de.wirecard.accept.sample"
         minSdkVersion 11
         targetSdkVersion 21
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.6"
     }
     packagingOptions {
         exclude 'META-INF/notice.txt'
@@ -69,8 +69,8 @@ dependencies {
 //    compile(name: 'accept-sdk-android-acceptsdksource-release', ext: 'aar')
 //    flavor_thyronCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
 //    flavor_bbposCompile(name: 'accept-sdk-android-bbposextension-release', ext: 'aar')
-    compile 'com.github.mposSVK:acceptSDK-Android:1.5.4'
-    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.3'
+    compile 'com.github.mposSVK:acceptSDK-Android:1.5.6'
+    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.4.1'
     flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 }

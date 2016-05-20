@@ -7,8 +7,12 @@ public class PaymentFlowActivity extends AbstractPaymentFlowActivity {
 
     @Override
     PaymentFlowController createNewController() {
-        // this is just feture because of supporting more terminals (lavours)
-        return new AcceptThyronPaymentFlowController(false, false);
+        // this is just feture because of supporting more terminals (flavours)
+
+        /**
+         * boolean alowFirmwareUpdate, boolean supportContactless, boolean sepa
+         */
+        return new AcceptThyronPaymentFlowController(false, false, sepa);
     }
 
     @Override

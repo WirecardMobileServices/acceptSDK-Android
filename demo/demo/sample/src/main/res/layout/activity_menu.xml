@@ -12,6 +12,12 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/sepa"
+        android:text="SEPA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/history"
         android:text="Transactions history"
         android:layout_width="match_parent"

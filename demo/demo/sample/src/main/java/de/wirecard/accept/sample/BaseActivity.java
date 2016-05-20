@@ -17,6 +17,8 @@ public class BaseActivity extends Activity {
     public final static String INTENT = "acceptsdk_intent";
     public final static String INTENT_TYPE = "acceptsdk_intent_type";
 
+    public final static String SEPA = "sepa";
+
     public final static int TYPE_LOGOUT = 1;
 
     @Override
