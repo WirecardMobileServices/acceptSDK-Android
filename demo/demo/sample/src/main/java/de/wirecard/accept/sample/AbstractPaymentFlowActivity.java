@@ -188,7 +188,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         if(AcceptSDK.getPrefTaxArray().isEmpty())
             tax = 0f;
         else tax = AcceptSDK.getPrefTaxArray().get(0);
-        AcceptSDK.addPaymentItem(new PaymentItem(1, "", new BigDecimal("10.0"), tax));
+        AcceptSDK.addPaymentItem(new PaymentItem(1, "", new BigDecimal("1.0"), tax));
 
         final Currency amountCurrency = Currency.getInstance(AcceptSDK.getCurrency());
         final long amountUnits = AcceptSDK.getPaymentTotalAmount().scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();
