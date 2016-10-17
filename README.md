@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
 	compile 'com.github.mposSVK:acceptSDK-Android:1.5.7'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
 }
 ```
 
