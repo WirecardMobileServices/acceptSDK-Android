@@ -6,13 +6,36 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <TextView
+    <LinearLayout
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1">
+    <EditText
         android:id="@+id/amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:textSize="20dp" />
+        android:textSize="18sp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        style="@style/Widget.AppCompat.EditText"
+        android:textStyle="normal|bold"
+        android:labelFor="@id/amount"
+        android:textAlignment="center" android:layout_weight="0.6" />
 
+    <Button
+        android:id="@+id/payButton"
+        android:text="Pay"
+        android:paddingLeft="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textAlignment="center"
+        android:textStyle="normal|bold"
+        android:textSize="18sp" />
+    </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

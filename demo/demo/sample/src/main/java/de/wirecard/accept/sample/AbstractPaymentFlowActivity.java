@@ -6,21 +6,24 @@
  */
 package de.wirecard.accept.sample;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Currency;
@@ -40,6 +43,12 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
     private PaymentFlowController paymentFlowController;
 
     protected Boolean sepa = false;// used for
+    EditText amountTextView;
+    Button payButton;
+    private Currency amountCurrency;
+    private static BigDecimal currentAmount = BigDecimal.ZERO;
+    private PaymentFlowController.Device currentDevice;
+
 
     public static Intent intent(final Context context) {
         return new Intent(context, PaymentFlowActivity.class);
@@ -49,6 +58,29 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
+
+        amountCurrency = Currency.getInstance(AcceptSDK.getCurrency());
+
+        amountTextView = (EditText)findViewById(R.id.amount);
+        amountTextView.addTextChangedListener(new MoneyTextWatcher(amountTextView));
+        amountTextView.setText(CurrencyUtils.format(100, amountCurrency, Locale.getDefault()));
+
+        payButton = (Button) findViewById(R.id.payButton);
+        payButton.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             if (currentDevice == null) {
+                                                 Toast.makeText(AbstractPaymentFlowActivity.this, "Device is null", Toast.LENGTH_SHORT).show();
+                                                 return;
+                                             }
+                                             if (BigDecimal.ZERO.equals(AbstractPaymentFlowActivity.currentAmount)) {
+                                                 Toast.makeText(AbstractPaymentFlowActivity.this, "Invalid amount", Toast.LENGTH_SHORT).show();
+                                                 return;
+                                             }
+                                             proceedToPayment(currentDevice);
+                                         }
+                                     }
+        );
 
         final Bundle b = getIntent().getExtras();
         if (b != null) {
@@ -145,7 +177,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                             return;
                         }
                         if ( devices.size() == 1 ) {
-                            proceedToPayment(devices.get(0));
+                            currentDevice = devices.get(0);
                             return;
                         }
                         PaymentFlowDialogs.showTerminalChooser(AbstractPaymentFlowActivity.this, devices, new PaymentFlowDialogs.DeviceToStringConverter<PaymentFlowController.Device>() {
@@ -159,7 +191,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                         }, new PaymentFlowDialogs.TerminalChooserListener<PaymentFlowController.Device>() {
                             @Override
                             public void onDeviceSelected(PaymentFlowController.Device device) {
-                                proceedToPayment(device);
+                                currentDevice = devices.get(0);
                             }
 
                             @Override
@@ -183,19 +215,32 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         paymentFlowSignatureView.clear();
         showProgress(getString(R.string.acceptsdk_progress__connecting, device.displayName), true);
         enableButtons(-1);
-        AcceptSDK.startPayment();
+        /*******************************************************************************************************************************/
+        /*                                  Payment                                                                                    */
+        /*******************************************************************************************************************************/
+        AcceptSDK.startPayment();// initialization of new payment in SDK
         Float tax;
-        if(AcceptSDK.getPrefTaxArray().isEmpty())
+        if(AcceptSDK.getPrefTaxArray().isEmpty())//if not filled out use "0f"
             tax = 0f;
-        else tax = AcceptSDK.getPrefTaxArray().get(0);
-        AcceptSDK.addPaymentItem(new PaymentItem(1, "", new BigDecimal("1.0"), tax));
+        else tax = AcceptSDK.getPrefTaxArray().get(0);// taxes are defined on backend and requested during communication..pls use only your "supported" values
 
-        final Currency amountCurrency = Currency.getInstance(AcceptSDK.getCurrency());
+        //here is example how to add one payment item to basket
+        AcceptSDK.addPaymentItem(new PaymentItem(1, "", currentAmount, tax));
+        //for demonstration we are using only one item to be able to fully controll amount from simple UI.
+
+        // and now we have to get amount in units from basket(with respect to taxes, number of items....)
         final long amountUnits = AcceptSDK.getPaymentTotalAmount().scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();
 
-        final TextView amountTextView = (TextView)findViewById(R.id.amount);
-        amountTextView.setText(CurrencyUtils.format(amountUnits, amountCurrency, Locale.getDefault()));
+        //and finally start pay( with given device, pay specified units in chosen currency)
         paymentFlowController.startPaymentFlow(device, amountUnits, amountCurrency, this);
+
+        //!!!! on first connection to terminal is SDK automatically checking configuration, for to be sure if it is newest used.
+        //strategy is to force user to try to pay every morning for test if everything is ok (connection, configuration, settings, ...)
+        // this first payment must not be compleated... if terminal displays requesting card message you can skip transaction by cancel button
+
+        /*******************************************************************************************************************************/
+        /*******************************************************************************************************************************/
+
     }
 
     @Override
@@ -426,5 +471,44 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                 }
             }
         });
+    }
+
+    public class MoneyTextWatcher implements TextWatcher {
+        private final WeakReference<EditText> editTextWeakReference;
+
+        public MoneyTextWatcher(EditText editText) {
+            editTextWeakReference = new WeakReference<EditText>(editText);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            EditText editText = editTextWeakReference.get();
+            if (editText == null) return;
+            String s = editable.toString();
+            editText.removeTextChangedListener(this);
+            String cleanString = s.replaceAll("["+amountCurrency.getSymbol(Locale.getDefault())+"]", "").replaceAll("\\s+","").replace(',','.');
+            String formatted = "";
+            try {
+                AbstractPaymentFlowActivity.currentAmount = new BigDecimal(cleanString);// because this is value for payment item
+
+                //and now lets try to format this value with propper currency sign/string
+                long parsed = new BigDecimal(cleanString).scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();//get number in prefered format (2 decimal points)
+                formatted = CurrencyUtils.format(parsed, amountCurrency, Locale.getDefault());//format him to string displayed in editbox
+                editText.setText(formatted);
+            }catch (NumberFormatException e){
+                AbstractPaymentFlowActivity.currentAmount = BigDecimal.ZERO;
+                Toast.makeText(AbstractPaymentFlowActivity.this, "Invalid number format", Toast.LENGTH_LONG).show();
+            }
+            editText.setSelection(formatted.length());//move cursor
+            editText.addTextChangedListener(this);
+        }
     }
 }
