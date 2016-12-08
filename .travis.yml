@@ -5,7 +5,7 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-21.1.2
+    - build-tools-24.0.1
     - android-24
   licenses:
     - 'android-sdk-preview-license-52d11cd2'
