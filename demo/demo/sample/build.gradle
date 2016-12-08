@@ -8,12 +8,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
     defaultConfig {
         applicationId "de.wirecard.accept.sample"
         minSdkVersion 12
-        targetSdkVersion 21
+        targetSdkVersion 24
         versionCode 8
         versionName "1.8"
     }
