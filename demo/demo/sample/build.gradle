@@ -74,4 +74,5 @@ dependencies {
     flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.5'
     flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    testCompile 'junit:junit:4.12'
 }
