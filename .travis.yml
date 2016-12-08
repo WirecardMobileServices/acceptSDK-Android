@@ -7,6 +7,7 @@ android:
     - platform-tools
     - build-tools-21.1.2
     - android-23
+    - extra-android-support
   licenses:
     - android-sdk-preview-license-52d11cd2
     - android-sdk-license-c81a61d9
