@@ -7,6 +7,8 @@ android:
     - platform-tools
     - build-tools-21.1.2
     - android-23
+  licenses:
+    - 'android-sdk-license-.+'
     
 branches:
   only:
