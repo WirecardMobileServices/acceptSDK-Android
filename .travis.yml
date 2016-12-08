@@ -7,9 +7,8 @@ android:
     - platform-tools
     - build-tools-21.1.2
     - android-23
-    - extra-android-support
-  licenses:    
-    - 'android-sdk-preview-license-.+'
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
     - 'intel-android-extra-license.+'
