@@ -6,8 +6,13 @@ android:
     - tools # to get the new `repository-11.xml`
     - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
     - platform-tools
-    - build-tools-24.0.3
-    - android-24
+    - build-tools-21.1.2
+    - android-23
 
+before_script:
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - adb wait-for-device
+  
 script:
-   - ./gradlew build connectedCheck
+   - ./gradlew build
