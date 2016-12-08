@@ -13,4 +13,5 @@ before_script:
   # - emulator -avd test -no-skin -no-audio -no-window &
   # - adb wait-for-device
   
-script: ./gradlew build
+script: 
+    - ./gradlew assembleRelease --stacktrace
