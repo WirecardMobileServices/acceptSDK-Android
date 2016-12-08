@@ -14,4 +14,4 @@ branches:
     - travis
 
 script: 
-    - ./gradlew assembleRelease --stacktrace
+    - gradle assembleRelease --stacktrace
