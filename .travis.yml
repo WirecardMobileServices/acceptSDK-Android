@@ -12,6 +12,9 @@ branches:
   only:
     - master
     - travis
+    
+before_script: 
+    - cd demo/demo
 
 script: 
     - ./gradlew build --stacktrace
