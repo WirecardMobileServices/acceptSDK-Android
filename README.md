@@ -2,6 +2,9 @@
 
 <img src="https://raw.githubusercontent.com/mposSVK/acceptSDK/master/docs/logo.png" alt="acceptSDK" width=240 height=95>
 
+[![CI Status](http://img.shields.io/travis/mposSVK/acceptSDK-Android.svg)](https://travis-ci.org/mposSVK/acceptSDK-Android)
+[![Version](https://jitpack.io/v/mposSVK/acceptSDK-Android.svg)](https://jitpack.io/#mposSVK/acceptSDK-Android)
+
 ## Overview
 The library enables cashless payment processing with selected mPOS terminals (magStripe and Chip and PIN) via the fully-licensed Wirecard Bank, Wirecard Retail Services which allows acceptance of many different cards, including Visa, MasterCard and American Express.
 
