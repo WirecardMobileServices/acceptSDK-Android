@@ -9,11 +9,6 @@ android:
     - android-24
     - extra-android-m2repository
     
-branches:
-  only:
-    - master
-    - travis
-    
 before_script: 
     - cd demo/demo
 
