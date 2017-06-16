@@ -25,6 +25,8 @@ public class Application extends android.app.Application {
     String errorMessage = "";
     SessionTerminatedReceiver receiver = null;
 
+    protected Boolean contactless = false;// used for switch using usb or bt
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,18 +34,21 @@ public class Application extends android.app.Application {
 
         receiver = new SessionTerminatedReceiver();
 
+        contactless = getResources().getBoolean(R.bool.demo_support_contactless);
+
         try {
             AcceptSDK.init(this,
-                    BuildConfig.clientID,
-                    BuildConfig.clientSecret,
-                    BuildConfig.apiPath);
-            AcceptSDK.loadExtensions(this, null);
+                    BuildConfig.clientID,           //Please obtain ClientID/Secret from Accept support team.
+                    BuildConfig.clientSecret,       // demo app is using external file for fill this attributes
+                    BuildConfig.apiPath);           //https://github.com/mposSVK/acceptSDK-Android/blob/master/demo/AcceptSDKAndroidDemo.properties
+            AcceptSDK.loadExtensions(this, null, contactless);
         } catch (IllegalArgumentException e) {
             errorMessage = e.getMessage();
         }
 
         AcceptSDK.setPrefTimeout(15);//timeout for requests
         if (AcceptSDK.isLoggedIn()) {
+            //use this if you will stay on same session, just app is working on longer task
             AcceptSDK.sessionRefresh(new OnRequestFinishedListener<HashMap<String, String>>() {
                 @Override
                 public void onRequestFinished(ApiResult apiResult, HashMap<String, String> result) {
@@ -53,7 +58,8 @@ public class Application extends android.app.Application {
                 }
             });
         }
-
+        //!!! do not forget on session terminated receiver
+        // is importand to be able detect situation which should logout from payment service
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(AcceptSDKIntents.SESSION_TERMINATED));
     }
 

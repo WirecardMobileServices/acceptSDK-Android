@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class PaymentFlowDialogs {
                 .setPositiveButton(R.string.acceptsdk_dialog_discovery_error_confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         confirmedClickListener.onClick(null);
                     }
                 }).create().show();
@@ -59,7 +61,12 @@ public class PaymentFlowDialogs {
                 .setTitle(R.string.acceptsdk_dialog_nothing_drawn_title)
                 .setMessage(R.string.acceptsdk_dialog_nothing_drawn_message)
                 .setCancelable(false /* important */)
-                .setPositiveButton(R.string.acceptsdk_dialog_nothing_drawn_confirm, null)
+                .setPositiveButton(R.string.acceptsdk_dialog_nothing_drawn_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
                 .create().show();
     }
 
@@ -71,11 +78,13 @@ public class PaymentFlowDialogs {
                 .setPositiveButton(R.string.acceptsdk_dialog_cancel_signature_request_confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         if (listener != null) listener.onSignatureRequestCancellationConfirmed();
                     }
                 }).setNegativeButton(R.string.acceptsdk_dialog_cancel_signature_request_skip, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
                 if (listener != null) listener.onSignatureRequestCancellationSkipped();
             }
         }).create().show();
@@ -93,12 +102,14 @@ public class PaymentFlowDialogs {
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     listener.onSignatureConfirmedIsOK();
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     listener.onSignatureConfirmedIsNotOK();
                 }
             });
@@ -116,6 +127,7 @@ public class PaymentFlowDialogs {
                 .setPositiveButton(R.string.acceptsdk_dialog_signature_instruction_confirm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         if ( confirmationClickListener != null ) confirmationClickListener.onClick(null);
                     }
                 })
@@ -123,16 +135,21 @@ public class PaymentFlowDialogs {
     }
 
     public static void showNoDevicesError(final Context context, final View.OnClickListener confirmedClickListener) {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.acceptsdk_dialog_no_terminals_title)
-                .setMessage(R.string.acceptsdk_dialog_no_terminals_message)
-                .setCancelable(false /* important */)
-                .setPositiveButton(R.string.acceptsdk_dialog_no_terminals_confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        Toast.makeText(context,
+                context.getString(R.string.acceptsdk_dialog_no_terminals_message)
+                , Toast.LENGTH_LONG).show();
+
+//        new AlertDialog.Builder(context)
+//                .setTitle(R.string.acceptsdk_dialog_no_terminals_title)
+//                .setMessage(R.string.acceptsdk_dialog_no_terminals_message)
+//                .setCancelable(false /* important */)
+//                .setPositiveButton(R.string.acceptsdk_dialog_no_terminals_confirm, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
                         if ( confirmedClickListener != null ) confirmedClickListener.onClick(null);
-                    }
-                }).create().show();
+//                    }
+//                }).create().show();
     }
 
     public static <T> void showTerminalChooser(Context context, final List<T> devices, DeviceToStringConverter<T> converter, final TerminalChooserListener<T> listener) {
@@ -159,15 +176,20 @@ public class PaymentFlowDialogs {
     }
 
     public static void showPaymentFlowError(Context context, PaymentFlowController.Error paymentFlowError, final String technicalMessage, final View.OnClickListener confirmClickListener) {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.acceptsdk_dialog_payment_error_title)
-                .setCancelable(false /* important */)
-                .setMessage(context.getString(R.string.acceptsdk_dialog_payment_error_message, paymentFlowError + " - " + technicalMessage))
-                .setPositiveButton(R.string.acceptsdk_dialog_payment_error_confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        Toast.makeText(context,
+                context.getString(R.string.acceptsdk_dialog_payment_error_message, paymentFlowError + " - " + technicalMessage)
+                , Toast.LENGTH_LONG).show();
+
+//        new AlertDialog.Builder(context)
+//                .setTitle(R.string.acceptsdk_dialog_payment_error_title)
+//                .setCancelable(false /* important */)
+//                .setMessage(context.getString(R.string.acceptsdk_dialog_payment_error_message, paymentFlowError + " - " + technicalMessage))
+//                .setPositiveButton(R.string.acceptsdk_dialog_payment_error_confirm, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
                         confirmClickListener.onClick(null);
-                    }
-                }).create().show();
+//                    }
+//                }).create().show();
     }
 }

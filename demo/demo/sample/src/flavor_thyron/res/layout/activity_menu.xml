@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+
     <Button
         android:id="@+id/payment"
         android:text="New Payment"
@@ -20,6 +21,12 @@
     <Button
         android:id="@+id/history"
         android:text="Transactions history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/configUpdate"
+        android:text="Configuration update"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

@@ -5,6 +5,7 @@
  */
 package de.wirecard.accept.sample;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,11 +17,11 @@ import android.widget.Toast;
 import java.util.List;
 
 import de.wirecard.accept.extension.refactor.AcceptThyronPaymentFlowController;
-import de.wirecard.accept.extension.thyron.ThyronDevice;
 import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.FirmwareNumberAndUrl;
 import de.wirecard.accept.sdk.backend.AcceptBackendService;
 import de.wirecard.accept.sdk.backend.AcceptFirmwareVersion;
+import de.wirecard.accept.sdk.extensions.Device;
 import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.TerminalInfo;
 
@@ -41,17 +42,29 @@ public class MenuActivity extends AbstractMenuActivity {
                 public void onClick(View v) {
                     AcceptSDK.saveCurrentVersionOfFirmwareInBackend(null);//clear remembered data
                     //SDK is remembering versions per login
-                    showSpireBoundedDevicesChooserDialog();
+                    startConfigurationCheckTask(true);
+                }
+            });
+
+        //additional feature only for Spire(thyron) terminals
+        Button configUpdateButton = (Button) findViewById(R.id.configUpdate);
+        if (configUpdateButton != null)
+            configUpdateButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startConfigurationCheckTask(false);
                 }
             });
 
     }
 
-    PaymentFlowController.Device device;
+    Device device;
 
-    private void showFirmwareActivity() {
-        startActivityForResult(FirmwareUpdateActivity.intent(getApplicationContext())
-                .putExtra(FirmwareUpdateActivity.EXTRA_SELECTED_DEVICE, new ThyronDevice(device.id))
+    private void showFirmwareAndConfigActivity(boolean firmware) {
+        startActivityForResult(
+                FirmwareUpdateActivity.intent(getApplicationContext())
+                        .putExtra(FirmwareUpdateActivity.EXTRA_SELECTED_DEVICE, device)
+                        .putExtra(FirmwareUpdateActivity.EXTRA_ITS_FIRMWARE_UPDATE_ALOWED, firmware)
                 , REQUEST_FIRMWARE_UPDATE);
     }
 
@@ -60,9 +73,12 @@ public class MenuActivity extends AbstractMenuActivity {
      * this is example how to get all SDK supported devices paired list
      */
 
-    private void showSpireBoundedDevicesChooserDialog() {
+    private void startConfigurationCheckTask(final boolean firmware) {
 
-        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController(false, true);
+        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController(false,
+                ((Application) getApplicationContext()).contactless,
+                false,
+                ((Application) getApplicationContext()).usb);
 
         //like first we have to call discover devices to get list of paired device from smartphone
         controller.discoverDevices(getApplicationContext(), new PaymentFlowController.DiscoverDelegate() {
@@ -73,74 +89,77 @@ public class MenuActivity extends AbstractMenuActivity {
             }
 
             @Override
-            public void onDiscoveredDevices(List<PaymentFlowController.Device> list) {
+            public void onDiscoveredDevices(List<Device> list) {
                 //received all paired devices from smartphone
                 if (list == null || list.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Settings: list of bounded devices empty, please pair terminal before.", Toast.LENGTH_LONG).show();
                     return;
                 }
-//>>> prepare data phase <<<
-                //this shows selector...bud this is usually done in your app... just demo app have to handle it before, because we need current used Device
-                PaymentFlowDialogs.showTerminalChooser(MenuActivity.this, list,
 
-                        new PaymentFlowDialogs.DeviceToStringConverter<PaymentFlowController.Device>() {
-                            @Override
-                            public String displayNameForDevice(PaymentFlowController.Device device) {
-                                if (TextUtils.isEmpty(device.displayName)) {
-                                    return device.id;
-                                }
-                                return device.displayName;
-                            }
-                        },
-                        new PaymentFlowDialogs.TerminalChooserListener<PaymentFlowController.Device>() {
-                            @Override
-                            public void onDeviceSelected(PaymentFlowController.Device selectedDevice) {
-                                device = selectedDevice;
+                if(((Application) getApplicationContext()).usb){
+                    device = list.get(0);
+                    if(firmware) {
+                        new FirmwareCheckTask().execute();
+                    }else{
+                        showFirmwareAndConfigActivity(false);
+                    }
+                    return;
+                }
 
-                                //this method is added only for support compatibility beween this (reviewed)SDK and new SDK 2.0
-                                //method start communication to get some basic terminal information (which we can compare with data from server)
-                                //in the new SDK it will be something like communication initialisation method
-
-                                //we have to simulate first connect to terminal and on succesfull connection event lets start wit real firmware update
-                                // sometimes is needed try again because restart-hardware related feature related to upload configuration during first connect,
-                                // in real implementation should be checkDeviceIdentity used only one time and best after the login into app.
-                                // therefore firmware update should be implemented in app like "behind" checkDeviceIdentity =first connect with terminal(in the settings screen for example)
-                                controller.checkDeviceIdentity(device, new AcceptThyronPaymentFlowController.SimpleConnectListener() {
-                                    @Override
-                                    public void onSuccessfulConnect(boolean withRestart) {
-                                        if (withRestart) {
-                                            //here you can display some message like terminal will be restarted after configuration update
-                                            Toast.makeText(getApplicationContext(), "New configuration files installed successfully. Your terminal will now reboot", Toast.LENGTH_LONG).show();
-                                        }
-                                        Toast.makeText(getApplicationContext(), "Installed Configuration files check succesfull. Continue", Toast.LENGTH_LONG).show();
-
-//>>> start of firmware update<<<
-                                        //start assync task for checking firmware version on server
-                                        new FirmwareCheckTask().execute();
-                                    }
-
-                                    @Override
-                                    public void onBluetoothConnectionError() {
-                                        Toast.makeText(getApplicationContext(), "Bluetooth connection error.", Toast.LENGTH_LONG).show();
-                                    }
-
-                                    @Override
-                                    public void onError(String technicalMessage) {
-                                        Log.e("checkDeviceIdentity", technicalMessage);
-                                        Toast.makeText(getApplicationContext(), "Check device identity error code : " + technicalMessage, Toast.LENGTH_LONG).show();
-                                    }
-                                });
-
-
-                            }
-
-                            @Override
-                            public void onSelectionCanceled() {
-                                finish();
-                            }
-                        });
+//TODO if list is only one device
+                showSpireBoundedDevicesChooserDialog(MenuActivity.this, list, firmware);
             }
         });
+    }
+
+    private void showSpireBoundedDevicesChooserDialog(Context context, List<Device> list, final boolean firmware) {
+        if (list != null && list.size() == 1) {
+            device = list.get(0);
+
+////>>> start of firmware update<<<
+//start assync task for checking firmware version on server
+            if (firmware) {
+                new FirmwareCheckTask().execute();
+            }
+            else {
+                showFirmwareAndConfigActivity(false);
+            }
+            return;
+        }
+
+//>>> prepare data phase <<<
+        //this shows selector...bud this is usually done in your app... just demo app have to handle it before, because we need current used Device
+        PaymentFlowDialogs.showTerminalChooser(context, list,
+
+                new PaymentFlowDialogs.DeviceToStringConverter<Device>() {
+                    @Override
+                    public String displayNameForDevice(Device device) {
+                        if (TextUtils.isEmpty(device.displayName)) {
+                            return device.id;
+                        }
+                        return device.displayName;
+                    }
+                },
+                new PaymentFlowDialogs.TerminalChooserListener<Device>() {
+                    @Override
+                    public void onDeviceSelected(Device selectedDevice) {
+                        device = selectedDevice;
+
+////>>> start of firmware update<<<
+//                                //start assync task for checking firmware version on server
+                        if (firmware) {
+                            new FirmwareCheckTask().execute();
+                        }
+                        else {
+                            showFirmwareAndConfigActivity(false);
+                        }
+                    }
+
+                    @Override
+                    public void onSelectionCanceled() {
+                        logOut();
+                    }
+                });
     }
 
     AcceptFirmwareVersion currentVersionDataFormBackend;
@@ -154,7 +173,7 @@ public class MenuActivity extends AbstractMenuActivity {
 
         protected AcceptBackendService.Response<AcceptFirmwareVersion, Void> doInBackground(String... urls) {
             AcceptSDK.saveCurrentVersionOfFirmwareInBackend(null);//clear remembered data
-            return AcceptSDK.fetchFirmwareVersionInfo();//setup new data and remember
+            return AcceptSDK.fetchFirmwareVersionInfo();
         }
 
         protected void onPostExecute(AcceptBackendService.Response<AcceptFirmwareVersion, Void> firmwareVersion) {
@@ -170,7 +189,7 @@ public class MenuActivity extends AbstractMenuActivity {
                 try {
                     if (device != null && TerminalInfo.needsFirmwareUpdate(currentVersionDataFormBackend.version)) { // throws exception if you will do something not allowed (mix versions/terminal compatibility)
                         AcceptSDK.saveCurrentVersionOfFirmwareInBackend(new FirmwareNumberAndUrl(currentVersionDataFormBackend.version, currentVersionDataFormBackend.url));
-                        showFirmwareActivity();
+                        showFirmwareAndConfigActivity(true);
                     } else {
                         Toast.makeText(getApplicationContext(), "Firmware version on terminal not need to be updated", Toast.LENGTH_LONG).show();
                     }

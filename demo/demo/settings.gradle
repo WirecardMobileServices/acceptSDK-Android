@@ -1,1 +1,4 @@
-include ':sample'
+include ':sample', ':accept-sdk-android-acceptsdksource',':accept-sdk-android-thyronextension',':accept-sdk-android-bbposextension'
+project(':accept-sdk-android-acceptsdksource').projectDir = new File("/../accept-apps-android-whitelabel/accept-sdk-android-acceptsdksource")
+project(':accept-sdk-android-thyronextension').projectDir = new File("/../accept-apps-android-whitelabel/accept-sdk-android-thyronextension")
+project(':accept-sdk-android-bbposextension').projectDir = new File("/../accept-apps-android-whitelabel/accept-sdk-android-bbposextension")

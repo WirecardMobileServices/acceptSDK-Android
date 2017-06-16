@@ -38,6 +38,10 @@
             android:name=".WrongAcceptSettingsActivity"
             android:configChanges="screenSize|screenLayout|orientation"
             android:screenOrientation="portrait" />
+        <service
+            android:name="de.wirecard.accept.extension.thyron.hardware.usb.UsbService"
+            android:enabled="true" >
+        </service>
     </application>
 
 </manifest>

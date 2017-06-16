@@ -10,14 +10,15 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Locale;
 
 import de.wirecard.accept.sdk.AcceptSDK;
+import de.wirecard.accept.sdk.L;
+import de.wirecard.accept.sdk.extensions.Device;
 import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.Payment;
 import de.wirecard.accept.sdk.model.PaymentItem;
@@ -40,14 +43,17 @@ import de.wirecard.accept.sdk.model.PaymentItem;
  */
 public abstract class AbstractPaymentFlowActivity extends BaseActivity implements PaymentFlowController.PaymentFlowDelegate {
 
-    private PaymentFlowController paymentFlowController;
+    final String TAG = AbstractPaymentFlowActivity.class.getSimpleName();
 
-    protected Boolean sepa = false;// used for
-    EditText amountTextView;
+    protected PaymentFlowController paymentFlowController;
+
+    protected Boolean sepa = false;// used for sepa payment support
+    Bundle sign = new Bundle();
     Button payButton;
     private Currency amountCurrency;
+    EditText amountTextView;
     private static BigDecimal currentAmount = BigDecimal.ZERO;
-    private PaymentFlowController.Device currentDevice;
+    private Device currentDevice;
 
 
     public static Intent intent(final Context context) {
@@ -62,8 +68,32 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         amountCurrency = Currency.getInstance(AcceptSDK.getCurrency());
 
         amountTextView = (EditText)findViewById(R.id.amount);
-        amountTextView.addTextChangedListener(new MoneyTextWatcher(amountTextView));
-        amountTextView.setText(CurrencyUtils.format(100, amountCurrency, Locale.getDefault()));
+        amountTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().isEmpty())
+                    return;
+                try {
+                    String amount = s.toString().replaceAll("[" + amountCurrency.getSymbol(Locale.getDefault()) + "]", "").replaceAll("\\s+", "").replace(',', '.');
+                    AbstractPaymentFlowActivity.currentAmount = new BigDecimal(amount);
+                } catch (NumberFormatException e) {
+                    AbstractPaymentFlowActivity.currentAmount = BigDecimal.ONE;
+                    Toast.makeText(AbstractPaymentFlowActivity.this, "Invalid number format", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        //amountTextView.setText(CurrencyUtils.format(150, amountCurrency, Locale.getDefault()));
+
 
         payButton = (Button) findViewById(R.id.payButton);
         payButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +108,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                                                  return;
                                              }
                                              proceedToPayment(currentDevice);
+                                             hideKeyboard();
                                          }
                                      }
         );
@@ -93,11 +124,25 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
             throw new IllegalArgumentException("You have to implement createNewController()");
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         proceedToDevicesDiscovery();
-        enableButtons(-1);
-        registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        enableSignatureControllButtons(-1);
+        //registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         isDestroyed = false;
+
+        hideKeyboard();
     }
+
+    private void disablePaymentControls(){
+        amountTextView.setEnabled(false);
+        payButton.setEnabled(false);
+    }
+
+    private void enablePaymentControls() {
+        amountTextView.setEnabled(true);
+        payButton.setEnabled(true);
+    }
+
 
     abstract PaymentFlowController createNewController();
 
@@ -110,7 +155,8 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         super.onDestroy();
         isDestroyed = true;
         handlePaymentInterrupted();
-        unregisterReceiver(screenOffReceiver);
+        //unregisterReceiver(screenOffReceiver);
+        paymentFlowController.cancelPaymentFlow();
     }
 
     @Override
@@ -131,7 +177,12 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         if ( signatureConfirmationDialog != null ) {
             signatureConfirmationDialog.dismiss();
         }
-        paymentFlowController.cancelPaymentFlow();
+        //paymentFlowController.cancelPaymentFlow();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private void runOnUiThreadIfNotDestroyed(final Runnable runnable) {
@@ -141,12 +192,13 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
     /**
      * first step discovery devices
      */
-    private void proceedToDevicesDiscovery() {
+    protected void proceedToDevicesDiscovery() {
         showProgress(R.string.acceptsdk_progress__searching, true);
         paymentFlowController.discoverDevices(this, new PaymentFlowController.DiscoverDelegate() {
 
             @Override
             public void onDiscoveryError(final PaymentFlowController.DiscoveryError error, final String technicalMessage) {
+                L.e(TAG, ">>> onDiscoveryError");
                 runOnUiThreadIfNotDestroyed(new Runnable() {
                     @Override
                     public void run() {
@@ -154,7 +206,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                         PaymentFlowDialogs.showTerminalDiscoveryError(AbstractPaymentFlowActivity.this, error, technicalMessage, new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                finish();
+                                //finish();
                             }
                         });
                     }
@@ -162,7 +214,8 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
             }
 
             @Override
-            public void onDiscoveredDevices(final List<PaymentFlowController.Device> devices) {
+            public void onDiscoveredDevices(final List<Device> devices) {
+                L.e(TAG, ">>> onDiscoveredDevices");
                 runOnUiThreadIfNotDestroyed(new Runnable() {
                     @Override
                     public void run() {
@@ -171,7 +224,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                             PaymentFlowDialogs.showNoDevicesError(AbstractPaymentFlowActivity.this, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    finish();
+                                    //finish();
                                 }
                             });
                             return;
@@ -180,18 +233,18 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                             currentDevice = devices.get(0);
                             return;
                         }
-                        PaymentFlowDialogs.showTerminalChooser(AbstractPaymentFlowActivity.this, devices, new PaymentFlowDialogs.DeviceToStringConverter<PaymentFlowController.Device>() {
+                        PaymentFlowDialogs.showTerminalChooser(AbstractPaymentFlowActivity.this, devices, new PaymentFlowDialogs.DeviceToStringConverter<Device>() {
                             @Override
-                            public String displayNameForDevice(PaymentFlowController.Device device) {
+                            public String displayNameForDevice(Device device) {
                                 if (TextUtils.isEmpty(device.displayName)) {
                                     return device.id;
                                 }
                                 return device.displayName;
                             }
-                        }, new PaymentFlowDialogs.TerminalChooserListener<PaymentFlowController.Device>() {
+                        }, new PaymentFlowDialogs.TerminalChooserListener<Device>() {
                             @Override
-                            public void onDeviceSelected(PaymentFlowController.Device device) {
-                                currentDevice = devices.get(0);
+                            public void onDeviceSelected(Device device) {
+                                currentDevice = device;
                             }
 
                             @Override
@@ -209,12 +262,12 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
      * second step: pay with discovered device
      * @param device
      */
-    private void proceedToPayment(final PaymentFlowController.Device device) {
+    private void proceedToPayment(final Device device) {
         signatureConfirmationDialog = null;
         final PaymentFlowSignatureView paymentFlowSignatureView = (PaymentFlowSignatureView)findViewById(R.id.signature);
         paymentFlowSignatureView.clear();
         showProgress(getString(R.string.acceptsdk_progress__connecting, device.displayName), true);
-        enableButtons(-1);
+        enableSignatureControllButtons(-1);
         /*******************************************************************************************************************************/
         /*                                  Payment                                                                                    */
         /*******************************************************************************************************************************/
@@ -232,7 +285,12 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         final long amountUnits = AcceptSDK.getPaymentTotalAmount().scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();
 
         //and finally start pay( with given device, pay specified units in chosen currency)
-        paymentFlowController.startPaymentFlow(device, amountUnits, amountCurrency, this);
+        try {
+            paymentFlowController.startPaymentFlow(device, amountUnits, amountCurrency, this);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "startPaymentFlow: "+ e.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
         //!!!! on first connection to terminal is SDK automatically checking configuration, for to be sure if it is newest used.
         //strategy is to force user to try to pay every morning for test if everything is ok (connection, configuration, settings, ...)
@@ -253,7 +311,8 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                 showProgress(R.string.acceptsdk_progress__firmware, true);
                 break;
             case LOADING:
-                showProgress("Loading, please wait...", true);
+            case COMMUNICATION_LAYER_ENABLING:
+                showProgress(R.string.acceptsdk_progress__loading_pls_wait, true);
                 break;
             case RESTARTING:
                 showProgress(R.string.acceptsdk_progress__restart, true);
@@ -276,6 +335,9 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
             case WAITING_FOR_INSERT_OR_SWIPE:
                 showProgress(R.string.acceptsdk_progress__insert_or_swipe, false);
                 break;
+            case WAITING_FOR_INSERT_SWIPE_OR_TAP:
+                showProgress(R.string.acceptsdk_progress__insert_swipe_or_tap, false);
+                break;
             case WAITING_FOR_SWIPE:
                 showProgress(R.string.acceptsdk_progress__swipe, false);
                 break;
@@ -285,8 +347,16 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
             case WAITING_FOR_AMOUNT_CONFIRMATION:
                 showProgress(R.string.acceptsdk_progress__confirm_amount, false);
                 break;
-           case TRANSACTION_UPDATE:
-               enableButtons(-1);
+            case WAITING_FOR_SIGNATURE_CONFIRMATION:
+                showProgress(R.string.acceptsdk_progress__confirm_signature, false);
+                showSignatureSection();
+                //just need to show captured signature on display for confirm
+                break;
+            case TERMINATING:
+                showProgress(R.string.acceptsdk_progress__terminating, false);
+                break;
+            case TRANSACTION_UPDATE:
+               enableSignatureControllButtons(-1);
                if ( signatureConfirmationDialog != null ) {
                    signatureConfirmationDialog.dismiss();
                    signatureConfirmationDialog = null;
@@ -294,7 +364,10 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                showProgress(R.string.acceptsdk_progress__tc_update, true);
                break;
             case WRONG_SWIPE:
-                showProgress("Bad readout", true);
+                showProgress(R.string.acceptsdk_progress__bad_readout, true);
+                break;
+            case UNKNOWN:
+                showProgress("unknown ???", true);
                 break;
         }
     }
@@ -308,7 +381,8 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                 PaymentFlowDialogs.showPaymentFlowError(AbstractPaymentFlowActivity.this, error, technicalDetails, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        finish();
+                        disablePaymentControls();
+                        //finish();
                     }
                 });
             }
@@ -323,7 +397,10 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
             public void run() {
                 showResultSection(true);
                 Toast.makeText(getApplicationContext(), "Payment successful !", Toast.LENGTH_LONG).show();
-                finish();
+                enablePaymentControls();
+                Receipt receipt = new Receipt(AbstractPaymentFlowActivity.this);
+                receipt.showReceipt(payment);
+                //finish();
             }
         });
     }
@@ -348,13 +425,14 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                         showSignatureSection();
                         final PaymentFlowSignatureView signatureView = (PaymentFlowSignatureView) findViewById(R.id.signature);
                         signatureView.clear();
-                        enableButtons(R.id.confirm_signature, R.id.cancel_signature_confirmation);
+                        enableSignatureControllButtons(R.id.confirm_signature, R.id.cancel_signature_confirmation);
                         findViewById(R.id.confirm_signature).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (signatureView.isSomethingDrawn()) {
-                                    enableButtons(-1);
+                                    enableSignatureControllButtons(-1);
                                     showProgress(-1, false);
+                                    signatureView.serialize(sign);
                                     signatureRequest.signatureEntered(signatureView.compressSignatureBitmapToPNG());
                                 } else {
                                     PaymentFlowDialogs.showNothingDrawnWarning(AbstractPaymentFlowActivity.this);
@@ -367,8 +445,9 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                                 PaymentFlowDialogs.showConfirmSignatureRequestCancellation(AbstractPaymentFlowActivity.this, new PaymentFlowDialogs.SignatureRequestCancelListener() {
                                     @Override
                                     public void onSignatureRequestCancellationConfirmed() {
+                                        Log.e(TAG, "onSignatureRequested >>> signatureCanceled");
                                         signatureRequest.signatureCanceled();
-                                        finish();
+                                        //finish();
                                     }
 
                                     @Override
@@ -406,12 +485,14 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                         .SignatureConfirmationListener() {
                     @Override
                     public void onSignatureConfirmedIsOK() {
+                        Log.e(TAG, "onSignatureConfirmationRequested >>> signatureConfirmed");
                         showProgress(R.string.acceptsdk_progress__follow, false);
                         signatureConfirmationRequest.signatureConfirmed();
                     }
 
                     @Override
                     public void onSignatureConfirmedIsNotOK() {
+                        Log.e(TAG, "onSignatureConfirmationRequested >>> signatureRejected");
                         signatureConfirmationRequest.signatureRejected();
                     }
                 });
@@ -451,13 +532,18 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         runOnUiThreadIfNotDestroyed(new Runnable() {
             @Override
             public void run() {
+                if(sign != null){
+                    PaymentFlowSignatureView view = (PaymentFlowSignatureView) findViewById(R.id.signature);
+                    if (view != null)
+                        view.showSignature(sign);
+                }
                 findViewById(R.id.progress_section).setVisibility(View.GONE);
                 findViewById(R.id.signature_section).setVisibility(View.VISIBLE);
             }
         });
     }
 
-    private void enableButtons(final Integer... ids) {
+    private void enableSignatureControllButtons(final Integer... ids) {
         final List<Integer> idsList = Arrays.asList(ids);
         runOnUiThreadIfNotDestroyed(new Runnable() {
             @Override
@@ -473,8 +559,18 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
         });
     }
 
+    public void hideKeyboard()
+    {
+        InputMethodManager imm = ( InputMethodManager )getSystemService( Context.INPUT_METHOD_SERVICE );
+        imm.hideSoftInputFromWindow( this.getWindow().getDecorView().getWindowToken(), 0 );
+    }
+
     public class MoneyTextWatcher implements TextWatcher {
         private final WeakReference<EditText> editTextWeakReference;
+
+        int position = 0;
+        String beforeChange = "";
+        String cleanString = "";
 
         public MoneyTextWatcher(EditText editText) {
             editTextWeakReference = new WeakReference<EditText>(editText);
@@ -482,19 +578,37 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            Log.e("MoneyTextWatcher", "beforeTextChanged: str: " + s + " / start: " + start + " / count: " + count + " / after" + after);
+            EditText editText = editTextWeakReference.get();
+            beforeChange = s.toString();
+            position  = editText.getSelectionStart();
+           // Log.e("MoneyTextWatcher", "beforeTextChanged: position " + position);
+
         }
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Log.e("MoneyTextWatcher", "onTextChanged: str: " +s + " / start: " + start + " / before: " + before + " / count: " + count);
+            if (s.toString().isEmpty()) {
+                return;
+            }
+            if(before>0){
+                int indexPoint  = beforeChange.indexOf(".");
+                if(start-1 == indexPoint) {
+                    position--;
+                    cleanString = beforeChange.replaceAll("["+amountCurrency.getSymbol(Locale.getDefault())+"]", "").replaceAll("\\s+","").replace(',','.');
+                }
+            }else{
+                cleanString = s.toString().replaceAll("["+amountCurrency.getSymbol(Locale.getDefault())+"]", "").replaceAll("\\s+","").replace(',','.');
+            }
         }
 
         @Override
         public void afterTextChanged(Editable editable) {
             EditText editText = editTextWeakReference.get();
-            if (editText == null) return;
-            String s = editable.toString();
             editText.removeTextChangedListener(this);
-            String cleanString = s.replaceAll("["+amountCurrency.getSymbol(Locale.getDefault())+"]", "").replaceAll("\\s+","").replace(',','.');
+
+            Log.e("MoneyTextWatcher", "afterTextChanged: " + cleanString);
             String formatted = "";
             try {
                 AbstractPaymentFlowActivity.currentAmount = new BigDecimal(cleanString);// because this is value for payment item
@@ -503,11 +617,12 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity implement
                 long parsed = new BigDecimal(cleanString).scaleByPowerOfTen(amountCurrency.getDefaultFractionDigits()).longValue();//get number in prefered format (2 decimal points)
                 formatted = CurrencyUtils.format(parsed, amountCurrency, Locale.getDefault());//format him to string displayed in editbox
                 editText.setText(formatted);
+                Log.e("MoneyTextWatcher", "formatted: " + formatted);
             }catch (NumberFormatException e){
                 AbstractPaymentFlowActivity.currentAmount = BigDecimal.ZERO;
                 Toast.makeText(AbstractPaymentFlowActivity.this, "Invalid number format", Toast.LENGTH_LONG).show();
             }
-            editText.setSelection(formatted.length());//move cursor
+            editText.setSelection(position);//move cursor
             editText.addTextChangedListener(this);
         }
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,15 +14,11 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
+import de.wirecard.accept.extension.refactor.AcceptThyronPaymentFlowController;
 import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.FirmwareNumberAndUrl;
-import de.wirecard.accept.sdk.cnp.CNPController;
-import de.wirecard.accept.sdk.cnp.CNPDevice;
-import de.wirecard.accept.sdk.cnp.observer.AdapterEvent;
-import de.wirecard.accept.sdk.cnp.observer.CNPListener;
-import de.wirecard.accept.sdk.cnp.observer.ProcessResult;
-import de.wirecard.accept.sdk.cnp.observer.ProcessState;
-import de.wirecard.accept.sdk.cnp.observer.TerminalEvent;
+import de.wirecard.accept.sdk.extensions.Device;
+import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.TerminalInfo;
 
 /**
@@ -30,23 +27,24 @@ import de.wirecard.accept.sdk.model.TerminalInfo;
  * This Activity is using CNPController to connect and CNPListener to get information from terminal.
  * You have to be sure it will be not called as fist communication attempt to terminal..because it requires some basic information about terminal
  */
-public class FirmwareUpdateActivity extends BaseActivity implements CNPListener {
+public class FirmwareUpdateActivity extends BaseActivity implements PaymentFlowController.ConfigureListener {
     private static String TAG = FirmwareUpdateActivity.class.getSimpleName();
 
     public static final String EXTRA_SELECTED_DEVICE = "selected_device";
+    public static final String EXTRA_ITS_FIRMWARE_UPDATE_ALOWED = "firmware_update_alowed_mode";
 
     TextView message_text;
     TextView progress_text;
     Button cancelButton;
 
-    private CNPDevice currentDev;
-    private CNPController<?> controller = null; //old version of implementation
+    private Device currentDev;
+    private AcceptThyronPaymentFlowController controller = null; //old version of implementation
     private boolean isDestroyed = false;
     private boolean terminalResetByApp = false;
 
     FirmwareNumberAndUrl firmwareNumberAndUrl;
     private AsyncTask actualTask = null;
-    private boolean restarted = false;
+    private boolean firmwareAlowedMode = true;
     private boolean finishedUpdate = false;
 
     public static Intent intent(final Context context) {
@@ -58,7 +56,7 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_firmware_update);
-
+        inProgressCounter = 0;
         message_text = (TextView) findViewById(R.id.textViewMessage);
         progress_text = (TextView) findViewById(R.id.textViewProgress);
         cancelButton = (Button) findViewById(R.id.button);
@@ -71,9 +69,10 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
                 finish();
             }
         });
+        firmwareAlowedMode = getIntent().getExtras().getBoolean(FirmwareUpdateActivity.EXTRA_ITS_FIRMWARE_UPDATE_ALOWED,true);
 
         firmwareNumberAndUrl = AcceptSDK.getCurrentVersionOfSavedFirmwareInBackend();
-        controller = AcceptSDK.getCNPController();
+        controller = new AcceptThyronPaymentFlowController(firmwareAlowedMode, ((Application) getApplicationContext()).contactless, false, ((Application) getApplicationContext()).usb);
         currentDev = getIntent().getExtras().getParcelable(FirmwareUpdateActivity.EXTRA_SELECTED_DEVICE);
         setResult(RESULT_CANCELED);
     }
@@ -81,14 +80,22 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
     @Override
     protected void onStart() {
         super.onStart();
-
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            progress_text.setText("bluetooth_is_currently_powered_off");
-            message_text.setText("Enable Bluetooth and try again");
-        } else {
+        boolean usb  = ((Application) getApplicationContext()).usb;
+        if(!usb) {
+            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                progress_text.setText("bluetooth_is_currently_powered_off");
+                message_text.setText("Enable Bluetooth and try again");
+                return;
+            }
+        }
+        if (firmwareAlowedMode) {
             actualTask = new LoadFirmwareTask().execute();
         }
+        else {
+            handleFirmwareFileReady();
+        }
+
     }
 
     @Override
@@ -104,10 +111,59 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
         }
     }
 
+    @Override
+    public void onConfigurationStarted() {
+        onConnectionStarted();
+    }
+
+    private int inProgressCounter = 0;
+
+    @Override
+    public void onConfigurationInProgress(String s) {
+        progress_text.setText("Processing...");
+        message_text.setText("Config update");
+        if(!TextUtils.isEmpty(s)){
+            message_text.setText(s + " (File " + ++inProgressCounter + ")");
+        }
+
+        // because here can be received during FW update also device config events(if device not updated config yet)
+        if (s.contains("FIRMWARE") && firmwareAlowedMode) {
+            // we have to display conditionally also firmware update message witch some params
+            message_text.setText(getString(R.string.wl_general_firmware_update_pending,
+                    AcceptSDK.getTerminalInfo() != null ? AcceptSDK.getTerminalInfo().firmwareVersion : "-",
+                    AcceptSDK.getCurrentVersionOfSavedFirmwareInBackend() != null ? AcceptSDK.getCurrentVersionOfSavedFirmwareInBackend().getFwNumber() : "-"));
+        }
+
+        //Log.e(TAG, s);
+
+    }
+
+    @Override
+    public void onConfigureSuccess(boolean restarted) {
+        progress_text.setText(" ");
+        if(firmwareAlowedMode) {
+            message_text.setText("New firmware installed successfully");
+        }else{
+            message_text.setText("New configuration installed successfully");
+        }
+        finishedUpdate = true;
+        if (restarted)
+            AcceptSDK.saveCurrentVersionOfFirmwareInBackend(null);
+
+        cancelButton.setText(R.string.wl_general_done);
+        setResult(RESULT_OK);
+    }
+
+    @Override
+    public void onConfigureError(PaymentFlowController.Error error, String errorMessage) {
+        if (!finishedUpdate)
+            showFailScreen(error, errorMessage);
+    }
+
     /**
      * just download firmware files from server and call handleFirmwareFileReady
      * <p/>
-     * this is just preparing files in local memory on device... connect method: controller.connectToDevice(currentDev, true, true, -1);
+     * this is just preparing files in local memory on device...
      * will start firmware update during communication starting
      */
     private class LoadFirmwareTask extends AsyncTask<Void, Void, String> {
@@ -131,8 +187,7 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
             if (error == null) {
                 handleFirmwareFileReady();
             } else {
-                showFailedConnectingScreen();
-                message_text.setText("Failed to open the zipped configuration file");
+                showFailScreen(null,"Failed to open the zipped configuration file");
             }
         }
     }
@@ -153,8 +208,7 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
             @Override
             public void run() {
                 if (!wasDestroyed()) {
-                    controller.setCNPListener(FirmwareUpdateActivity.this);
-                    controller.connectToDevice(currentDev, true, true, -1);
+                    controller.connectAndConfigure(currentDev, FirmwareUpdateActivity.this);
                 }
             }
         });
@@ -164,144 +218,28 @@ public class FirmwareUpdateActivity extends BaseActivity implements CNPListener 
         return isDestroyed;
     }
 
-    @Override
-    public void onAdapterEvent(AdapterEvent event) {
-        Log.d(TAG, "onAdapterEvent: " + event);
+    private void showFailScreen(PaymentFlowController.Error error, String errorMessage) {
+        progress_text.setText("=ERROR=");
+        message_text.setText("Pairing: connect failed");
+        if (error != null)
+            progress_text.setText(error.name());
 
-        switch (event) {
-            case ADAPTER_DISABLED:
-                showBluetoothConnectionLostScreen();
-                break;
-            case ADAPTER_DISABLING:
-
-                break;
-            case ADAPTER_ENABLING:
-
-                break;
-            case ADAPTER_IDLE:
-                Log.d(TAG, "Idle with action: " + event.getActionCode());
-                switch (event.getActionCode()) {
-                    case AdapterEvent.ACTION_IDLE_CONNECTION_FAILED_CRITICAL:
-                    case AdapterEvent.ACTION_IDLE_CONNECTION_FAILED:
-                    case AdapterEvent.ACTION_IDLE:
-                    case AdapterEvent.ACTION_IDLE_CONNECTION_FINISHED:
-                        if (!finishedUpdate)
-                            showFailedConnectingScreen();
-                        break;
-                    case AdapterEvent.ACTION_IDLE_CONNECTION_LOST:
-                        if (!terminalResetByApp && !finishedUpdate)
-                            showBluetoothConnectionLostScreen();
-                        break;
-                    case AdapterEvent.ACTION_IDLE_CONF_UPDATE_FAILED:
-                        showBluetoothConnectionLostScreen();
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
+        if (!TextUtils.isEmpty(errorMessage))
+            message_text.setText("Pairing: connect failed");
     }
 
-    private void showFailedConnectingScreen() {
-        progress_text.setText(' ');
-        message_text.setText("Bluetooth pairing: connect failed");
-    }
-
-    private void showBluetoothConnectionLostScreen() {
-        progress_text.setText(' ');
-        message_text.setText("Bluetooth pairing: connection lost");
-    }
-
-    @Override
     public void onConnectionStarted() {
         Log.d(TAG, "onConnectionStarted");
-        progress_text.setText("PROGRESS_STATE_CONTACTING");
-        message_text.setText("Bluetooth pairing: connecting");
-    }
-
-    @Override
-    public void onTerminalEvent(TerminalEvent action) {
-        Log.d(TAG, "onTerminalEvent: " + action);
-        switch (action) {
-            case CONFIG_UPDATE_FINISHED:
-
-                break;
-            case CONFIG_UPDATE_STARTED:
-                progress_text.setText("Processing...");
-                message_text.setText("Installing new firmware");
-                break;
-            case FIRMWARE_UPDATE_AVAILABLE:
-
-                break;
-            case FIRMWARE_UPDATE_FINISHED:
-                progress_text.setText(" ");
-                message_text.setText("New firmware installed successfully");
-                finishedUpdate = true;
-                if (restarted)
-                    AcceptSDK.saveCurrentVersionOfFirmwareInBackend(null);
-
-                cancelButton.setText(R.string.wl_general_done);
-                setResult(RESULT_OK);
-                break;
-            case FIRMWARE_UPDATE_STARTED:
-                progress_text.setText("Processing...");
-                message_text.setText(getString(R.string.wl_general_firmware_update_pending,
-                        AcceptSDK.getTerminalInfo() != null ? AcceptSDK.getTerminalInfo().firmwareVersion : "-",
-                        AcceptSDK.getCurrentVersionOfSavedFirmwareInBackend() != null ? AcceptSDK.getCurrentVersionOfSavedFirmwareInBackend().getFwNumber() : "-"));
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onConnectionEstablished(boolean restartRequired) {
-        Log.d(TAG, "connection established");
-        if (restartRequired && controller != null && !restarted) {
-            terminalResetByApp = true;
-            controller.restartDevice();
-            restarted = true;
-        }
-    }
-
-    @Override
-    public void onProcessStarted() {
-        //do nothing
-    }
-
-    @Override
-    public void onProcessUpdate(ProcessState state) {
-        //do nothing
-    }
-
-    @Override
-    public void onProcessFinished(ProcessResult result, Exception errorException) {
-        //do nothing
+        progress_text.setText("CONNECTING");
+        message_text.setText("Pairing: connecting");
     }
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "disconnecting from cnp controller");
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        disconnect();
+        controller = null;
+        finish();
         super.onDestroy();
-    }
-
-    private void disconnect() {
-        if (controller != null) {
-            controller.disconnect();
-            controller.setCNPListener(null);
-            controller = null;
-            finish();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "unregister from cnp controller");
-        if (controller == null) return;
-        controller.setCNPListener(null);
     }
 
     @Override

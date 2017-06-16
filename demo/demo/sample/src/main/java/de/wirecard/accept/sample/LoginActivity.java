@@ -46,6 +46,7 @@ public class LoginActivity extends BaseActivity {
         });
         ((TextView) findViewById(R.id.backend)).setText(BuildConfig.apiPath);
         ((TextView) findViewById(R.id.version)).setText("Version: " + BuildConfig.VERSION_NAME +"("+ BuildConfig.VERSION_CODE + ")");
+
     }
 
     @Override

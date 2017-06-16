@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="manifest_app_name">Accept Sample App - Thyron</string>
+    <string name="manifest_app_name">Accept Sample App - Thyron BT</string>
     <string name="wl_general_firmware_update_pending">Updating the firmware from %1$s to %2$s ...</string>
     <string name="wl_general_done">Done</string>
 </resources>

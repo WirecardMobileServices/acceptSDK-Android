@@ -28,6 +28,7 @@
     <string name="acceptsdk_dialog_no_terminals_title">No terminals</string>
     <string name="acceptsdk_dialog_no_terminals_message">Please pair Posmate terminal with your device and try again later.</string>
     <string name="acceptsdk_dialog_no_terminals_confirm">OK</string>
+    <string name="use_usb">use USB</string>
 
     <string name="acceptsdk_dialog_cancel_signature_request_title">Signature</string>
     <string name="acceptsdk_dialog_cancel_signature_request_message">Do you really want to cancel signature step. Please press YES to cancel.</string>
@@ -53,10 +54,15 @@
     <string name="acceptsdk_progress__processing">Processing data…</string>
     <string name="acceptsdk_progress__follow">Please follow instructions displayed on terminal</string>
     <string name="acceptsdk_progress__confirm_amount">Confirm amount…</string>
+    <string name="acceptsdk_progress__confirm_signature">Confirm signature…</string>
+    <string name="acceptsdk_progress__terminating">Terminating…</string>
     <string name="acceptsdk_progress__tc_update">Sending transaction confirmation…</string>
     <string name="acceptsdk_progress__enter_pin">Enter PIN…</string>
     <string name="acceptsdk_progress__restart">Restart</string>
     <string name="acceptsdk_progress__insert_or_swipe">Insert or swipe card…</string>
+    <string name="acceptsdk_progress__insert_swipe_or_tap">Insert, swipe or present card…</string>
+    <string name="acceptsdk_progress__loading_pls_wait">Loading, please wait…</string>
+    <string name="acceptsdk_progress__bad_readout">Bad readout</string>
     <string name="acceptsdk_progress__insert">Insert card…</string>
     <string name="acceptsdk_progress__swipe">Swipe card…</string>
     <string name="acceptsdk_progress__remove">Pleases remove card…</string>

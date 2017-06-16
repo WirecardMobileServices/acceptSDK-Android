@@ -49,11 +49,15 @@ public abstract class AbstractMenuActivity extends BaseActivity {
         findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AcceptSDK.logout();
-                startActivity(new Intent(AbstractMenuActivity.this, LoginActivity.class));
-                finish();
+            logOut();
             }
         });
 
+    }
+
+    protected void logOut(){
+        AcceptSDK.logout();
+        startActivity(new Intent(AbstractMenuActivity.this, LoginActivity.class));
+        finish();
     }
 }

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--ThyronExtension is reserved string for identification using Spire(Thyron) extensions-->
     <item name="wl_default_terminal_type_use" type="string">bbPOSExtension</item>
+
+    <item name="demo_support_contactless" type="bool">false</item>
+
+    <!-- set list of supported extensions -->
     <string-array name="extensions_list">
         <item>bbPOSExtension</item>
     </string-array>
