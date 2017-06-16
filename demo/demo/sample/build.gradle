@@ -8,14 +8,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "de.wirecard.accept.sample"
-        minSdkVersion 12
-        targetSdkVersion 24
-        versionCode 8
-        versionName "1.8"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 11
+        versionName "1.11.1"
     }
     packagingOptions {
         exclude 'META-INF/notice.txt'
@@ -67,16 +67,14 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.0.1'
+     compile 'com.github.mposSVK:acceptSDK-Android:1.5.9'
+     flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.8'
+     flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.3'
+
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
+    compile 'com.android.support:appcompat-v7:' + rootProject.ext.supportLib
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
-//    compile(name: 'accept-sdk-android-acceptsdksource-release', ext: 'aar')
-//    flavor_thyronCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
-//    flavor_bbposCompile(name: 'accept-sdk-android-bbposextension-release', ext: 'aar')
-    compile 'com.github.mposSVK:acceptSDK-Android:1.5.7'
-    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.5'
-    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    testCompile 'junit:junit:4.12'
+
 }
