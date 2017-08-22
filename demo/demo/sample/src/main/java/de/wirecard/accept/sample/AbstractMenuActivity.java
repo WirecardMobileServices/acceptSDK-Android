@@ -28,6 +28,13 @@ public abstract class AbstractMenuActivity extends BaseActivity {
             }
         });
 
+        findViewById(R.id.cash_payment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(CashPaymentActivity.intent(getApplicationContext()));
+            }
+        });
+
         findViewById(R.id.sepa).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +60,12 @@ public abstract class AbstractMenuActivity extends BaseActivity {
             }
         });
 
+        findViewById(R.id.alipay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(AlipayPaymentActivity.intent(getApplicationContext()));
+            }
+        });
     }
 
     protected void logOut(){

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+ package="de.wirecard.accept.sample" >
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <application>
+        <activity
+            android:name=".FirmwareUpdateActivity"
+            android:configChanges="screenSize|screenLayout|orientation"
+            android:screenOrientation="portrait"/>
+        <service
+            android:name="de.wirecard.accept.extension.thyron.hardware.usb.UsbService"
+            android:enabled="true" >
+        </service>
+
+    </application>
+</manifest>

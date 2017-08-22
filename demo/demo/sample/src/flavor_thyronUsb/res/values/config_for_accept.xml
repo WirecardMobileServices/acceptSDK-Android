@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="demo_support_contactless" type="bool">true</item>
-    <item name="demo_communicate_with_spire_on_usb" type="bool">false</item>
+    <item name="demo_communicate_with_spire_on_usb" type="bool">true</item>
 
     <string-array name="extensions_list">
         <item>SpireExtension</item>

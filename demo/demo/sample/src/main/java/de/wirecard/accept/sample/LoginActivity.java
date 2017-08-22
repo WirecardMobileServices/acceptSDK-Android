@@ -9,6 +9,7 @@ package de.wirecard.accept.sample;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,12 +20,17 @@ import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.ApiResult;
 import de.wirecard.accept.sdk.OnRequestFinishedListener;
 
+
+
 public class LoginActivity extends BaseActivity {
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         String sdkWrongConfigErrorMessage = ((Application) getApplication()).getErrorMessage();
         if(!TextUtils.isEmpty(sdkWrongConfigErrorMessage)) {
             Intent i = new Intent(this, WrongAcceptSettingsActivity.class);
@@ -47,6 +53,16 @@ public class LoginActivity extends BaseActivity {
         ((TextView) findViewById(R.id.backend)).setText(BuildConfig.apiPath);
         ((TextView) findViewById(R.id.version)).setText("Version: " + BuildConfig.VERSION_NAME +"("+ BuildConfig.VERSION_CODE + ")");
 
+        sharedPreferences = getSharedPreferences("demo", Activity.MODE_PRIVATE);
+        if (sharedPreferences != null) {
+            EditText usernameEditText = (EditText) findViewById(R.id.username);
+            if (usernameEditText != null)
+                usernameEditText.setText(getLastUsedUserName());
+
+            EditText passwordEditText = (EditText) findViewById(R.id.password);
+            if (passwordEditText != null)
+                passwordEditText.setText(getLastUsedUserPass());
+        }
     }
 
     @Override
@@ -68,6 +84,10 @@ public class LoginActivity extends BaseActivity {
             return;
         }
         enableForm(false);
+
+        if (sharedPreferences != null)
+            rememberLastUsedUser(username, password);
+
         AcceptSDK.login(username, password, new OnRequestFinishedListener<Object>() {
             @Override
             public void onRequestFinished(ApiResult apiResult, Object result) {
@@ -96,4 +116,20 @@ public class LoginActivity extends BaseActivity {
                 .create()
                 .show();
     }
+
+    private void rememberLastUsedUser(String username, String password) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("LAST_USED_USERNAME", username);
+        editor.putString("LAST_USED_PASSWORD", password);
+        editor.commit();
+    }
+
+    private String getLastUsedUserName(){
+        return sharedPreferences.getString("LAST_USED_USERNAME","");
+    }
+
+    private String getLastUsedUserPass(){
+        return sharedPreferences.getString("LAST_USED_PASSWORD","");
+    }
+
 }

@@ -7,16 +7,24 @@
 
     <Button
         android:id="@+id/payment"
-        android:text="New Payment"
+        android:text="New card payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
+    <Button
+        android:id="@+id/cash_payment"
+        android:text="New cash payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/sepa"
-        android:text="SEPA"
+        android:text="New SEPA payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
+    <Button
+        android:id="@+id/alipay"
+        android:text="New alipay payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/history"
         android:text="Transactions history"

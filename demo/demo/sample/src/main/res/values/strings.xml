@@ -67,5 +67,16 @@
     <string name="acceptsdk_progress__swipe">Swipe card…</string>
     <string name="acceptsdk_progress__remove">Pleases remove card…</string>
     <string name="acceptsdk_progress__customer_sign_request">Please sign here and confirm signature with CONFIRM button.</string>
+    <string name="btn_set_sub_merchant_info">Set sub merchant info</string>
+    <string name="sub_merchant_info_required_fields">* Required fields</string>
+    <string name="sub_merchant_post_code_label">Sub merchant post code *</string>
+    <string name="sub_merchant_street_label">Sub merchant street *</string>
+    <string name="sub_merchant_city_label">Sub merchant city *</string>
+    <string name="sub_merchant_state_label">Sub merchant state *</string>
+    <string name="sub_merchant_country_label">Sub merchant country *</string>
+    <string name="sub_merchant_name_label">Sub merchant name *</string>
+    <string name="sub_merchant_id_label">Sub merchant ID *</string>
+    <string name="additional_info_function_id_label">Function id (optional)</string>
+    <string name="additional_info_job_id_label">Job id (optional)</string>
 
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
+    <item name="demo_allow_sub_merchant_info" type="bool">true</item>
+    <item name="demo_allow_additional_payment_fields" type="bool">true</item>
 </resources>

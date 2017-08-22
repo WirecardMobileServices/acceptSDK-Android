@@ -16,29 +16,26 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.model.Payment;
 import de.wirecard.accept.sdk.model.PaymentItem;
 import de.wirecard.accept.sdk.util.CurrencyWrapper;
 import de.wirecard.accept.sdk.util.ReceiptBuilder;
 import de.wirecard.accept.sdk.util.TaxUtils;
 
-/**
- * Created by jakub.misko on 13. 6. 2017.
- */
-
-public class Receipt {
+class Receipt {
     private Context context;
 
-    public Receipt(Context context) {
+    Receipt(Context context) {
         this.context = context;
     }
 
     /**
      * presentation of sdk receipt building and data getting
      *
-     * @param p
+     * @param p Payment object
      */
-    public Dialog showReceipt(Payment p) {
+    Dialog showReceipt(Payment p) {
         MyStringBuilder sb = new MyStringBuilder(new StringBuilder());
         sb.append("Receipt number ");
         sb.appendWithNextLine(ReceiptBuilder.getReceiptNumber(p));
@@ -50,7 +47,7 @@ public class Receipt {
         appendPaymentItems(sb, p);
         sb.append('\n');
         sb.append("Total: \t\t");
-        sb.appendWithNextLine(CurrencyWrapper.setAmountFormat(p.getTotalAmount(), p.getCurrency()));
+        sb.appendWithNextLine(CurrencyWrapper.setAmountFormat(ReceiptBuilder.getTransactionAmount(p), ReceiptBuilder.getTransactionCurrency(p)));
         sb.append('\n');
         sb.appendWithNextLine("Payment details:");
         appendPaymentDetails(sb, p);
@@ -99,13 +96,13 @@ public class Receipt {
         for (PaymentItem pi : items) {
             final String desc = (TextUtils.isEmpty(pi.getNote()) ? "No description" : pi.getNote());
             final String tax = TaxUtils.taxRateToString(Payment.SCALE, pi.getTaxRate()) + "%";
-            final String price = CurrencyWrapper.setAmountFormat(pi.getPrice(), p.getCurrency());
+            final String price = CurrencyWrapper.setAmountFormat(pi.getPrice(), ReceiptBuilder.getTransactionCurrency(p));
             final String totalAmount;
             if (taxIsInclusive) {
-                totalAmount = CurrencyWrapper.setAmountFormat(pi.getTotalPrice(), p.getCurrency());
+                totalAmount = CurrencyWrapper.setAmountFormat(pi.getTotalPrice(), ReceiptBuilder.getTransactionCurrency(p));
             }
             else {
-                totalAmount = CurrencyWrapper.setAmountFormat(TaxUtils.getTotalItemAmount(pi), p.getCurrency());
+                totalAmount = CurrencyWrapper.setAmountFormat(TaxUtils.getTotalItemAmount(pi), ReceiptBuilder.getTransactionCurrency(p));
             }
             sb.appendWithNextLine(desc);
             sb.append(pi.getQuantity() + " * ");
@@ -118,43 +115,80 @@ public class Receipt {
     }
 
     private void appendPaymentDetails(MyStringBuilder sb, Payment p) {
-        if (p.getStatus() != null) {
-            sb.append("Transaction status: \t\t");
-            sb.appendWithNextLine(p.getStatus().toString());
-        }
-        if (!TextUtils.isEmpty(p.getCardNumber())) {
-            sb.append("Card number: \t\t");
-            sb.appendWithNextLine(p.getCardNumber());
-        }
-        if (!TextUtils.isEmpty(p.getCardHolderLastName())) {
-            sb.append("Cardholder name: \t\t");
-            sb.append(p.getCardHolderFirstName());
-            sb.append(" ");
-            sb.appendWithNextLine(p.getCardHolderLastName());
-        }
-        if (!TextUtils.isEmpty(p.getCardType())) {
+
+        sb.append("Transaction status: \t\t");
+        AcceptSDK.Status ts = ReceiptBuilder.getTransactionStatus(p);
+        if (ts != null)
+            sb.appendWithNextLine(ts.toString());
+
+        sb.append("Transaction type: \t\t");
+        sb.appendWithNextLine(p.getTransactionTypeString().toUpperCase());
+
+        if (p.getTransactionType() != AcceptSDK.TransactionType.CASH_PAYMENT) {
             sb.append("Card Type: \t\t");
-            sb.appendWithNextLine(p.getCardType());
+            sb.appendWithNextLine(ReceiptBuilder.getCardTypeForReceipt(p));
+
+            sb.append("Card Payment method: \t\t");
+            sb.appendWithNextLine(ReceiptBuilder.getCardPaymentMethod(p, context));
+
+            if (ReceiptBuilder.showPinVerified(p)) {
+                sb.appendWithNextLine("\t\t == Pin verified== \t\t");
+            }
+
+            sb.append("Card number: \t\t");
+            sb.appendWithNextLine(ReceiptBuilder.getMaskedCardNumber(p));
+
+            sb.append("Cardholder name: \t\t");
+            sb.append(ReceiptBuilder.getCardHolderFirstName(p));
+            sb.append(" ");
+            sb.appendWithNextLine(ReceiptBuilder.getCardHolderLastName(p));
+
+            sb.append("TID: \t\t");
+            sb.appendWithNextLine(ReceiptBuilder.getTerminalID(p));
+
+            sb.append("MID: \t\t");
+            sb.appendWithNextLine(ReceiptBuilder.getMerchantID(p));
+
         }
-        if (!TextUtils.isEmpty(p.getAuthorizationCode())) {
+        String tmp = ReceiptBuilder.getReceiptNumber(p);
+        if (!TextUtils.isEmpty(tmp)) {
+            sb.append("Receipt: \t\t");
+            sb.appendWithNextLine(tmp);
+        }
+
+        tmp = ReceiptBuilder.getAuthorisationCode(p);
+        if (!TextUtils.isEmpty(tmp)) {
             sb.append("Approval Code: \t\t");
-            sb.appendWithNextLine(p.getAuthorizationCode());
+            sb.appendWithNextLine(tmp);
         }
-        if (!TextUtils.isEmpty(p.getApplicationID())) {
+        tmp = ReceiptBuilder.getAID(p);
+        if(TextUtils.isEmpty(tmp)) {
             sb.append("Application ID: \t\t");
-            sb.appendWithNextLine(p.getApplicationID());
+            sb.appendWithNextLine(tmp);
         }
-        if (!TextUtils.isEmpty(p.getApplicationLabel())) {
+        tmp =ReceiptBuilder.getApplicationLabel(p);
+        if(!TextUtils.isEmpty(tmp)) {
             sb.append("Application Label: \t\t");
-            sb.appendWithNextLine(p.getApplicationLabel());
+            sb.appendWithNextLine(tmp);
+        }
+
+        tmp = ReceiptBuilder.getAOSA(p);
+        if (!TextUtils.isEmpty(tmp)) {
+            sb.append("AOSA value for print: \t\t");
+            sb.appendWithNextLine(tmp);
+        }
+        tmp = ReceiptBuilder.getTC(p.getTransactionCertificate());
+        if (!TextUtils.isEmpty(tmp)) {
+            sb.append("TC: \t\t");
+            sb.appendWithNextLine(tmp);
         }
     }
 
-    class MyStringBuilder {
+    private class MyStringBuilder {
 
         private StringBuilder sb;
 
-        public MyStringBuilder(StringBuilder sb) {
+        MyStringBuilder(StringBuilder sb) {
             this.sb = sb;
         }
 
@@ -166,17 +200,17 @@ public class Receipt {
             return this;
         }
 
-        public MyStringBuilder append(String string) {
+        MyStringBuilder append(String string) {
             sb.append(string);
             return this;
         }
 
-        public MyStringBuilder append(char character) {
+        MyStringBuilder append(char character) {
             sb.append(character);
             return this;
         }
 
-        public MyStringBuilder appendTwoStringsWithNextLine(String string1, String string2) {
+        MyStringBuilder appendTwoStringsWithNextLine(String string1, String string2) {
             if (!TextUtils.isEmpty(string1))
                 sb.append(string1);
             if (!TextUtils.isEmpty(string2))

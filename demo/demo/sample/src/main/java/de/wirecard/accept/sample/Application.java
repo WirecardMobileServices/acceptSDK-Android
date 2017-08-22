@@ -25,6 +25,7 @@ public class Application extends android.app.Application {
     String errorMessage = "";
     SessionTerminatedReceiver receiver = null;
 
+    protected Boolean usb = false;// used for switch using usb or bt
     protected Boolean contactless = false;// used for switch using usb or bt
 
     @Override
@@ -34,6 +35,7 @@ public class Application extends android.app.Application {
 
         receiver = new SessionTerminatedReceiver();
 
+        usb = getResources().getBoolean(R.bool.demo_communicate_with_spire_on_usb);
         contactless = getResources().getBoolean(R.bool.demo_support_contactless);
 
         try {
@@ -41,7 +43,7 @@ public class Application extends android.app.Application {
                     BuildConfig.clientID,           //Please obtain ClientID/Secret from Accept support team.
                     BuildConfig.clientSecret,       // demo app is using external file for fill this attributes
                     BuildConfig.apiPath);           //https://github.com/mposSVK/acceptSDK-Android/blob/master/demo/AcceptSDKAndroidDemo.properties
-            AcceptSDK.loadExtensions(this, null, contactless);
+            AcceptSDK.loadExtensions(this, null, contactless, usb);
         } catch (IllegalArgumentException e) {
             errorMessage = e.getMessage();
         }
