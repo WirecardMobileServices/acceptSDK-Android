@@ -209,7 +209,8 @@ public class TransactionsHistoryActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        receiptDialog.dismiss();
+        if (receiptDialog != null)
+            receiptDialog.dismiss();
         receiptDialog = null;
     }
 }
