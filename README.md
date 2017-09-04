@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
-	compile 'com.github.mposSVK:acceptSDK-Android:1.5.10.1'
+	compile 'com.github.mposSVK:acceptSDK-Android:1.5.10.2'
 }
 ```
 
@@ -42,7 +42,7 @@ SDK|Spire extension|BBPos extension|
 1.5.6.3|1.5.4.1|1.5.1|
 1.5.7|1.5.5|1.5.2|
 1.5.9|1.5.8|1.5.3|
-1.5.10.1|1.5.9.1|1.5.4|
+1.5.10.2|1.5.9.2|1.5.4|
 
 ## Contact
 Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com "acceptSDK") for acceptSDK support and mPOS Whitelabel solution
