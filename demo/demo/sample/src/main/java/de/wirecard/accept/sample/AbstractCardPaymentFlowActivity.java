@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,20 +21,33 @@ import de.wirecard.accept.sdk.extensions.Device;
 import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 import de.wirecard.accept.sdk.model.Payment;
 
+/**
+ * Activity with card payment support
+ */
 public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlowActivity implements PaymentFlowController.PaymentFlowDelegate {
+
     private Dialog signatureConfirmationDialog = null;
     protected PaymentFlowController paymentFlowController;
     private Boolean sepa = false;// used for sepa payment support
-    private Device currentDevice;
+    protected Device currentDevice;
     private Bitmap signature;
 
     abstract PaymentFlowController createNewController();
 
     abstract boolean isSignatureConfirmationInApplication();
 
+    abstract boolean isRequiredPermissionOnStart();
+
+    abstract PaymentFlowController.DiscoverDelegate getDiscoverDelegate();
+
+    abstract void startPaymentFlow(Device device, long amount) throws IllegalStateException;
+
     public Boolean getSepa() {
         return sepa;
     }
+
+    protected int RECORD_RESPONSE_CODE = 111;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +55,8 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         final Bundle b = getIntent().getExtras();
         if (b != null) {
             sepa = b.getBoolean(BaseActivity.SEPA, false);
+            currentDevice = b.getParcelable(BaseActivity.CURRENT_DEVICE);
+            cashBack = AcceptSDK.CashBack.from(b.getInt(BaseActivity.CASH_BACK,0));
         }
 
         paymentFlowController = createNewController();
@@ -50,78 +64,20 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         if (paymentFlowController == null)
             throw new IllegalArgumentException("You have to implement createNewController()");
 
-
-        proceedToDevicesDiscovery();
         enableSignatureControllButtons(-1);
+
+        if(!isRequiredPermissionOnStart()) {
+            proceedToDevicesDiscovery();
+        }
     }
 
     /**
      * first step discovery devices
      */
     protected void proceedToDevicesDiscovery() {
+        enableSignatureControllButtons(-1);
         showProgress(R.string.acceptsdk_progress__searching, true);
-        paymentFlowController.discoverDevices(this, new PaymentFlowController.DiscoverDelegate() {
-
-            @Override
-            public void onDiscoveryError(final PaymentFlowController.DiscoveryError error, final String technicalMessage) {
-                L.e(TAG, ">>> onDiscoveryError");
-                runOnUiThreadIfNotDestroyed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showProgress(-1, false);
-                        PaymentFlowDialogs.showTerminalDiscoveryError(AbstractCardPaymentFlowActivity.this, error, technicalMessage, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //finish();
-                            }
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void onDiscoveredDevices(final List<Device> devices) {
-                L.e(TAG, ">>> onDiscoveredDevices");
-                runOnUiThreadIfNotDestroyed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showProgress(-1, false);
-                        if (devices.isEmpty()) {
-                            PaymentFlowDialogs.showNoDevicesError(AbstractCardPaymentFlowActivity.this, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    //finish();
-                                }
-                            });
-                            return;
-                        }
-                        if (devices.size() == 1) {
-                            currentDevice = devices.get(0);
-                            return;
-                        }
-                        PaymentFlowDialogs.showTerminalChooser(AbstractCardPaymentFlowActivity.this, devices, new PaymentFlowDialogs.DeviceToStringConverter<Device>() {
-                            @Override
-                            public String displayNameForDevice(Device device) {
-                                if (TextUtils.isEmpty(device.displayName)) {
-                                    return device.id;
-                                }
-                                return device.displayName;
-                            }
-                        }, new PaymentFlowDialogs.TerminalChooserListener<Device>() {
-                            @Override
-                            public void onDeviceSelected(Device device) {
-                                currentDevice = device;
-                            }
-
-                            @Override
-                            public void onSelectionCanceled() {
-                                finish();
-                            }
-                        });
-                    }
-                });
-            }
-        });
+        paymentFlowController.discoverDevices(this, getDiscoverDelegate());
     }
 
 
@@ -143,7 +99,10 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         final long amountUnits = AcceptSDK.getPaymentTotalAmount().scaleByPowerOfTen(getAmountCurrency().getDefaultFractionDigits()).longValue();
         //and finally start pay( with given device, pay specified units in chosen currency)
         try {
-            paymentFlowController.startPaymentFlow(device, amountUnits, getAmountCurrency(), this);
+            // required call start payment on controller
+            // paymentFlowController.startPaymentFlow(device, amount, getAmountCurrency(), this);
+            startPaymentFlow(device, amountUnits);
+            //in case its bbpos solution we are not supporting cashback therefore is here this abstraction used
         } catch (IllegalStateException e) {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), "startPaymentFlow: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -152,6 +111,8 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         //!!!! on first connection to terminal is SDK automatically checking configuration, for to be sure if it is newest used.
         //strategy is to force user to try to pay every morning for test if everything is ok (connection, configuration, settings, ...)
         // this first payment must not be compleated... if terminal displays requesting card message you can skip transaction by cancel button
+
+        //or simply use configuration update before paymnet start in your app flow
 
         /*******************************************************************************************************************************/
         /*******************************************************************************************************************************/
@@ -227,16 +188,19 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
                 showProgress(R.string.acceptsdk_progress__bad_readout, true);
                 break;
             case UNKNOWN:
-                showProgress("unknown ???", true);
+                //reading of ICC failed >> fallback to swipe
+                showProgress(R.string.acceptsdk_progress__swipe, true);
                 break;
         }
     }
 
     @Override
     public void onPaymentFlowError(final PaymentFlowController.Error error, final String technicalDetails) {
+        L.e(TAG, "<<< onPaymentFlowError "+ error.name() +" / "+technicalDetails);
         runOnUiThreadIfNotDestroyed(new Runnable() {
             @Override
             public void run() {
+                hideSignatureDialog();
                 showResultSection(false);
                 PaymentFlowDialogs.showPaymentFlowError(AbstractCardPaymentFlowActivity.this, error, technicalDetails, new View.OnClickListener() {
                     @Override
@@ -251,13 +215,13 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
 
     @Override
     public void onPaymentSuccessful(final Payment payment, String TC) {
-
+        L.e(TAG, "<<< onPaymentSuccessful");
         runOnUiThreadIfNotDestroyed(new Runnable() {
             @Override
             public void run() {
                 showResultSection(true);
                 Toast.makeText(getApplicationContext(), "Payment successful !", Toast.LENGTH_LONG).show();
-                enablePaymentControls();
+                disablePaymentControls();
                 showReceipt(payment);
                 //finish();
             }
@@ -306,7 +270,10 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
                                     public void onSignatureRequestCancellationConfirmed() {
                                         Log.e(TAG, "onSignatureRequested >>> signatureCanceled");
                                         signatureRequest.signatureCanceled();
-                                        //finish();
+                                        hideSignatureSection();
+                                        showProgress(R.string.acceptsdk_progress__declined, false);
+                                        paymentFlowController.cancelPaymentFlow();
+//                                        finish();
                                     }
 
                                     @Override
@@ -368,9 +335,7 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
     }
 
     private void handlePaymentInterrupted() {
-        if (signatureConfirmationDialog != null) {
-            signatureConfirmationDialog.dismiss();
-        }
+        hideSignatureDialog();
         //paymentFlowController.cancelPaymentFlow();
     }
 
@@ -408,6 +373,17 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         });
     }
 
+    private void hideSignatureSection(){
+        runOnUiThreadIfNotDestroyed(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.progress_section).setVisibility(View.VISIBLE);
+                findViewById(R.id.signature_section).setVisibility(View.GONE);
+                findViewById(R.id.buttons_section).setVisibility(View.GONE);
+            }
+        });
+    }
+
     private void enableSignatureControllButtons(final Integer... ids) {
         final List<Integer> idsList = Arrays.asList(ids);
         runOnUiThreadIfNotDestroyed(new Runnable() {
@@ -423,4 +399,12 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
             }
         });
     }
+
+    private void hideSignatureDialog(){
+        if (signatureConfirmationDialog != null) {
+            signatureConfirmationDialog.dismiss();
+        }
+    }
+    
+
 }

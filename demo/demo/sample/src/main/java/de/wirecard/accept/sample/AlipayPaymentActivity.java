@@ -12,6 +12,7 @@ import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.ApiResult;
 import de.wirecard.accept.sdk.OnRequestFinishedListener;
 import de.wirecard.accept.sdk.model.Payment;
+import de.wirecard.accept.sdk.util.CurrencyCode;
 
 public class AlipayPaymentActivity extends AbstractPaymentFlowActivity {
 
@@ -24,6 +25,10 @@ public class AlipayPaymentActivity extends AbstractPaymentFlowActivity {
         super.onCreate(savedInstanceState);
         showProgress(-1, false);
         AcceptSDK.setPaymentTransactionType(AcceptSDK.TransactionType.ALIPAY_PAYMENT);
+
+        //normally its set by default from merchant config...in this case we will overwrite merchant setting because Alipay is supported only for USD
+        AcceptSDK.setCurrency(CurrencyCode.USD.name());
+
     }
 
     @Override

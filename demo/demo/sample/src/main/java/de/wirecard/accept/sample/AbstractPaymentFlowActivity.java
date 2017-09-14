@@ -25,11 +25,12 @@ import java.util.Currency;
 import java.util.Locale;
 
 import de.wirecard.accept.sdk.AcceptSDK;
+import de.wirecard.accept.sdk.model.CashBackItem;
 import de.wirecard.accept.sdk.model.Payment;
 import de.wirecard.accept.sdk.model.PaymentItem;
 
 /**
- * Basin payment flow controlling activity
+ * Basic payment flow controlling activity
  */
 public abstract class AbstractPaymentFlowActivity extends BaseActivity {
 
@@ -38,6 +39,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity {
     private Currency amountCurrency;
     private EditText amountTextView;
     private  /*static*/ BigDecimal currentAmount = BigDecimal.ZERO;
+    protected AcceptSDK.CashBack cashBack = AcceptSDK.CashBack.off;
     private Button subMerchInfo;
     private Button additionalFields;
     protected boolean isDestroyed = false; // To support Android 4.2, 4.2.2 ( < API 17 ).
@@ -61,6 +63,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
+
         subMerchInfo = (Button) findViewById(R.id.sub_merch_info);
         if (getResources().getBoolean(R.bool.demo_allow_sub_merchant_info)) {
             subMerchInfo.setOnClickListener(new View.OnClickListener() {
@@ -141,18 +144,25 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity {
             return true;
         }
         disablePaymentControls();
-        subMerchInfo.setVisibility(View.GONE);
-        hideKeyboard();
-//        AcceptSDK.startPayment();// initialization of new payment in SDK
-        Float tax;
-        if (AcceptSDK.getPrefTaxArray().isEmpty())//if not filled out use "0f"
-            tax = 0f;
-        else
-            tax = AcceptSDK.getPrefTaxArray().get(0);// taxes are defined on backend and requested during communication..pls use only your "supported" values
 
-        //here is example how to add one payment item to basket
-        AcceptSDK.addPaymentItem(new PaymentItem(1, "", getCurrentAmount(), tax));
-        //for demonstration we are using only one item to be able to fully controll amount from simple UI.
+        hideKeyboard();
+
+
+        if (cashBack == AcceptSDK.CashBack.off) {
+            Float tax;
+            if (AcceptSDK.getPrefTaxArray().isEmpty())//if not filled out use "0f"
+                tax = 0f;
+            else
+                tax = AcceptSDK.getPrefTaxArray().get(0);// taxes are defined on backend and requested during communication..pls use only your "supported" values
+
+            //here is example how to add one payment item to basket
+            AcceptSDK.addPaymentItem(new PaymentItem(1, "", getCurrentAmount(), tax));
+            //for demonstration we are using only one item to be able to fully controll amount from simple UI.
+        }
+        else {
+            AcceptSDK.setCashBackItem(new CashBackItem("CashBack item note", currentAmount));
+        }
+
         //hide additional fields during payment
         if (getResources().getBoolean(R.bool.demo_allow_additional_payment_fields)) {
             additionalFields.setVisibility(View.GONE);
@@ -190,6 +200,7 @@ public abstract class AbstractPaymentFlowActivity extends BaseActivity {
                         R.string.acceptsdk_progress__sucesful : R.string.acceptsdk_progress__declined));
                 findViewById(R.id.progress_section).setVisibility(View.GONE);
                 findViewById(R.id.signature_section).setVisibility(View.GONE);
+                disablePaymentControls();
             }
         });
     }

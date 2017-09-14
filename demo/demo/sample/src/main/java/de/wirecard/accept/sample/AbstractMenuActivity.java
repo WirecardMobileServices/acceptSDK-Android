@@ -4,13 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import de.wirecard.accept.sdk.AcceptSDK;
+import de.wirecard.accept.sdk.extensions.Device;
 
 /**
  * @linc MenuActivity.java
  */
 public abstract class AbstractMenuActivity extends BaseActivity {
+
+    abstract void discoverDevices();
+
+    protected Device currentUsedDevice;
 
     public static Intent intent(final Context context) {
         return new Intent(context, MenuActivity.class);
@@ -21,29 +27,23 @@ public abstract class AbstractMenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        Button discoverDevicesButton = (Button) findViewById(R.id.discoverDevices);
+        if (discoverDevicesButton != null) {
+            discoverDevicesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    currentUsedDevice = null; //because we will not use remembered one
+                    discoverDevices();
+                }
+            });
+        }
+
         findViewById(R.id.payment).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(PaymentFlowActivity.intent(getApplicationContext()));
             }
         });
-
-        findViewById(R.id.cash_payment).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(CashPaymentActivity.intent(getApplicationContext()));
-            }
-        });
-
-        findViewById(R.id.sepa).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = PaymentFlowActivity.intent(getApplicationContext());
-                i.putExtra(BaseActivity.SEPA, true);
-                startActivity(i);
-            }
-        });
-
 
         findViewById(R.id.history).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,20 +52,13 @@ public abstract class AbstractMenuActivity extends BaseActivity {
             }
         });
 
-
         findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            logOut();
+                logOut();
             }
         });
 
-        findViewById(R.id.alipay).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(AlipayPaymentActivity.intent(getApplicationContext()));
-            }
-        });
     }
 
     protected void logOut(){
@@ -73,4 +66,6 @@ public abstract class AbstractMenuActivity extends BaseActivity {
         startActivity(new Intent(AbstractMenuActivity.this, LoginActivity.class));
         finish();
     }
+
+
 }

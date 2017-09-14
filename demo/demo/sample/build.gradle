@@ -9,12 +9,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25//rootProject.ext.compileSdkVersion
-    buildToolsVersion '25.0.3'//rootProject.ext.buildToolsVersion
+    compileSdkVersion 25
+    buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "de.wirecard.accept.sample"
-        minSdkVersion 14//rootProject.ext.minSdkVersion
-        targetSdkVersion 25//rootProject.ext.targetSdkVersion
+        minSdkVersion 14
+        targetSdkVersion 25
         versionCode 12
         versionName "1.12.0"
     }
@@ -57,7 +57,7 @@ android {
                 appProps.put("clientSecret", System.getenv('BACKEND_DEFAULT_SECRET'))
                 appProps.put("apiPath", System.getenv('BACKEND_DEFAULT_URL'))
             }
-            //change it to "spm2" for default
+
             buildConfigField "String", "clientID", appProps.getProperty("clientID", "\"\"")
             buildConfigField "String", "clientSecret", appProps.getProperty("clientSecret", "\"\"")
             buildConfigField "String", "apiPath", appProps.getProperty("apiPath", "\"\"")
@@ -74,19 +74,18 @@ android {
 }
 
 dependencies {
-    compile 'com.github.mposSVK:acceptSDK-Android:1.5.10'
-    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.4'
-    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9'
-    flavor_thyronUsbCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9'
+//    compile 'com.github.mposSVK:acceptSDK-Android:1.5.10.2'
+//    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.4'
+//    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9.2'
+//    flavor_thyronUsbCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9.2'
 
-//    compile project(':accept-sdk-android-acceptsdksource')
-//    flavor_thyronCompile project(':accept-sdk-android-thyronextension')
-//    flavor_thyronUsbCompile project(':accept-sdk-android-thyronextension')
-//    flavor_bbposCompile project(':accept-sdk-android-bbposextension')
+    compile(name: 'accept-sdk-android-acceptsdksource-release', ext: 'aar')
+    flavor_thyronCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
+    flavor_thyronUsbCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
+    flavor_bbposCompile (name: 'accept-sdk-android-bbposextension-release', ext: 'aar')
 
-
-    compile 'com.android.support:appcompat-v7:' + rootProject.ext.supportLib
-    compile 'com.android.support:design:' + rootProject.ext.supportLib
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'

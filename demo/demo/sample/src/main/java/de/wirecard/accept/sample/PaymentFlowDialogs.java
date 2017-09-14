@@ -1,8 +1,7 @@
 /**
- *  Copyright (c) 2015 Wirecard. All rights reserved.
- *
- *  Accept SDK for Android
- *
+ * Copyright (c) 2015 Wirecard. All rights reserved.
+ * <p>
+ * Accept SDK for Android
  */
 package de.wirecard.accept.sample;
 
@@ -29,16 +28,19 @@ public class PaymentFlowDialogs {
 
     public interface TerminalChooserListener<T> {
         void onDeviceSelected(T device);
+
         void onSelectionCanceled();
     }
 
     public interface SignatureRequestCancelListener {
         void onSignatureRequestCancellationConfirmed();
+
         void onSignatureRequestCancellationSkipped();
     }
 
     public interface SignatureConfirmationListener {
         void onSignatureConfirmedIsOK();
+
         void onSignatureConfirmedIsNotOK();
     }
 
@@ -82,23 +84,23 @@ public class PaymentFlowDialogs {
                         if (listener != null) listener.onSignatureRequestCancellationConfirmed();
                     }
                 }).setNegativeButton(R.string.acceptsdk_dialog_cancel_signature_request_skip, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if (listener != null) listener.onSignatureRequestCancellationSkipped();
-            }
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (listener != null) listener.onSignatureRequestCancellationSkipped();
+                    }
         }).create().show();
     }
 
     public static Dialog showSignatureConfirmation(final Context context, Bitmap signature, boolean showButtons, final SignatureConfirmationListener listener) {
         final View contentView = LayoutInflater.from(context).inflate(R.layout.dialog_for_sign_confirm, null);
-        ((ImageView)contentView.findViewById(R.id.image)).setImageBitmap(signature);
+        ((ImageView) contentView.findViewById(R.id.image)).setImageBitmap(signature);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.acceptsdk_dialog_signature_confirm_title)
                 .setView(contentView)
                 .setCancelable(false /* important */);
 
-        if(showButtons) {
+        if (showButtons) {
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -128,7 +130,8 @@ public class PaymentFlowDialogs {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        if ( confirmationClickListener != null ) confirmationClickListener.onClick(null);
+                        if (confirmationClickListener != null)
+                            confirmationClickListener.onClick(null);
                     }
                 })
                 .create().show();
@@ -147,14 +150,14 @@ public class PaymentFlowDialogs {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
 //                        dialog.dismiss();
-                        if ( confirmedClickListener != null ) confirmedClickListener.onClick(null);
+        if (confirmedClickListener != null) confirmedClickListener.onClick(null);
 //                    }
 //                }).create().show();
     }
 
     public static <T> void showTerminalChooser(Context context, final List<T> devices, DeviceToStringConverter<T> converter, final TerminalChooserListener<T> listener) {
         final List<CharSequence> convertedNames = new ArrayList<CharSequence>();
-        for ( T device : devices ) {
+        for (T device : devices) {
             convertedNames.add(converter.displayNameForDevice(device));
         }
         new AlertDialog.Builder(context)
@@ -188,7 +191,7 @@ public class PaymentFlowDialogs {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
 //                        dialog.dismiss();
-                        confirmClickListener.onClick(null);
+        confirmClickListener.onClick(null);
 //                    }
 //                }).create().show();
     }

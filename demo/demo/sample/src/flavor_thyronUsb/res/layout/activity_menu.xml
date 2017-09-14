@@ -5,45 +5,51 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-
     <Button
-        android:id="@+id/payment"
-        android:text="New card payment"
+        android:id="@+id/discoverDevices"
+        android:text="1. Discover devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/cash_payment"
-        android:text="New cash payment"
+        android:id="@+id/configUpdate"
+        android:text="2. Configuration update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/firmwareUpdate"
+        android:text="3. Firmware update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/payment"
+        android:text="4.1 New card payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
         android:id="@+id/sepa"
-        android:text="New SEPA payment"
+        android:text="4.2 New SEPA payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
         android:id="@+id/alipay"
-        android:text="New alipay payment"
+        android:text="4.3 New alipay payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/cash_back_payment"
+        android:text="4.4 New cashback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/cash_payment"
+        android:text="5. New cash payment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
         android:id="@+id/history"
-        android:text="Transactions history"
+        android:text="6. Transactions history"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/configUpdate"
-        android:text="Configuration update"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/firmwareUpdate"
-        android:text="Firmware update"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <Button
         android:id="@+id/logout"
         android:text="Log out"

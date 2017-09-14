@@ -6,7 +6,7 @@
 
     <application>
         <activity
-            android:name=".FirmwareUpdateActivity"
+            android:name=".ConfigurationAndFirmwareUpdateActivity"
             android:configChanges="screenSize|screenLayout|orientation"
             android:screenOrientation="portrait"/>
 
