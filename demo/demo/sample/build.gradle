@@ -86,6 +86,10 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
+
+    compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
+    compile 'org.apache.httpcomponents:httpmime:4.3.5'
+
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'
