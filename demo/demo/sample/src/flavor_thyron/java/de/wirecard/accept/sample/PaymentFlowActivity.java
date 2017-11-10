@@ -20,7 +20,7 @@ public class PaymentFlowActivity extends AbstractCardPaymentFlowActivity {
         /**
          * boolean supportContactless, boolean sepa, boolean usb
          */
-        return new AcceptThyronPaymentFlowController(((Application) getApplicationContext()).contactless, getSepa(), ((Application) getApplicationContext()).usb);
+        return new AcceptThyronPaymentFlowController(((Application) getApplicationContext()).contactless, isSepa(), ((Application) getApplicationContext()).usb);
     }
 
     @Override
@@ -35,12 +35,17 @@ public class PaymentFlowActivity extends AbstractCardPaymentFlowActivity {
 
     @Override
     void startPaymentFlow(Device device, long amount) throws IllegalStateException {
-        if(cashBack == AcceptSDK.CashBack.off) {
-            paymentFlowController.startPaymentFlow(device, amount, getAmountCurrency(), this);
-        }else{
-            //amount set in AbstractPaymentFlowActivity.beforePayment()
-            ((AcceptThyronPaymentFlowController)paymentFlowController).startCashBackPaymentFlow(device, cashBack, this);
+        if (isSepa()) { // in case its sepa payment
+            ((AcceptThyronPaymentFlowController) paymentFlowController).startSepaPaymentFlow(device, amount, getAmountCurrency(), this);
+            return;
         }
+        if (cashBack != AcceptSDK.CashBack.off) { // in case cashback will be supported
+            //cashBack amount is set in AbstractPaymentFlowActivity.beforePayment()
+            ((AcceptThyronPaymentFlowController) paymentFlowController).startCashBackPaymentFlow(device, cashBack, this);
+            return;
+        }
+        //default is normal card payment using spire SPm2 terminal
+        paymentFlowController.startPaymentFlow(device, amount, getAmountCurrency(), this);
     }
 
     PaymentFlowController.DiscoverDelegate getDiscoverDelegate() {

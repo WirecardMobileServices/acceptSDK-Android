@@ -18,9 +18,9 @@ public class PaymentFlowActivity extends AbstractCardPaymentFlowActivity {
         // this is just feture because of supporting more terminals (flavours)
 
         /**
-         * boolean supportContactless, boolean sepa, boolean usb
+         * AcceptThyronPaymentFlowController(boolean supportContactless, boolean sepaPayment, boolean useUsb)
          */
-        return new AcceptThyronPaymentFlowController(((Application) getApplicationContext()).contactless, getSepa(), ((Application) getApplicationContext()).usb);
+        return new AcceptThyronPaymentFlowController(((Application) getApplicationContext()).contactless, isSepa(), ((Application) getApplicationContext()).usb);
     }
 
     @Override

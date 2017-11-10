@@ -25,7 +25,8 @@
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="normal|bold"
-            android:theme="@style/Widget.AppCompat.EditText" />
+            android:theme="@style/Widget.AppCompat.EditText"
+            android:maxLength="10"/>
         <!--style="@style/Widget.AppCompat.EditText"-->
         <Button
             android:id="@+id/payButton"

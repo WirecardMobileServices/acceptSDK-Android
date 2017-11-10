@@ -5,17 +5,11 @@
  */
 package de.wirecard.accept.sample;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.List;
 
 import de.wirecard.accept.extension.refactor.AcceptThyronPaymentFlowController;
-import de.wirecard.accept.extension.refactor.FirmwareVersionCheckAsyncTask;
 import de.wirecard.accept.sdk.extensions.Device;
 import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 
@@ -26,7 +20,7 @@ public class MenuActivity extends AbstractSpireMenuActivity {
     void discoverDevices() {
 
 //>>>>>>>>>> 1. create controller instance
-        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController();//default is BT
+        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController();//default is BT, contactLessSupported = true
 
 //>>>>>>>>>> 2. call discovery devices
         //like first we have to call discover devices to get list of paired device from smartphone
@@ -46,6 +40,7 @@ public class MenuActivity extends AbstractSpireMenuActivity {
                 }
                 if (list.size() == 1) {// just one device
                     currentUsedDevice = list.get(0);
+                    Toast.makeText(getApplicationContext(), "Settings: one device detected.", Toast.LENGTH_LONG).show();
                     selectDeviceDelegate.onDeviceSelected(currentUsedDevice);
                     return;
                 }

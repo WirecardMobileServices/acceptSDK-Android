@@ -23,7 +23,8 @@ public class MenuActivity extends AbstractSpireMenuActivity {
     void discoverDevices() {
 
 //>>>>>>>>>> 1. create controller instance
-        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController(true);//use usb = true ;)
+        //AcceptThyronPaymentFlowController(boolean supportContactless, boolean sepaPayment, boolean useUsb)
+        final AcceptThyronPaymentFlowController controller = new AcceptThyronPaymentFlowController(true, false,true);
 
 //>>>>>>>>>> 2. call discovery devices
         //like first we have to call discover devices to get list of paired device from smartphone

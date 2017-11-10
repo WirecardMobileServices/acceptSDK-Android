@@ -2,8 +2,10 @@ package de.wirecard.accept.sample;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import de.wirecard.accept.extension.refactor.FirmwareVersionCheckAsyncTask;
+import de.wirecard.accept.sdk.AcceptSDK;
 import de.wirecard.accept.sdk.extensions.Device;
 import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 
@@ -19,6 +22,10 @@ public abstract class AbstractSpireMenuActivity extends AbstractMenuActivity {
 
     private static final int REQUEST_CONFIG_OR_FIRMWARE_UPDATE_ACTIVITY = 11;
     private ProgressDialog progressDialog;
+
+    private final String rupayCAP = "Rupay Cash at POS";
+    private final String masterAndVisaPWCB = "Master/Visa purchase with cashback";
+    private final String[] menu = new String[]{rupayCAP, masterAndVisaPWCB};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,32 @@ public abstract class AbstractSpireMenuActivity extends AbstractMenuActivity {
         });
 
 
+        Button cashBackButton = (Button) findViewById(R.id.cash_back_payment);
+        if (cashBackButton != null) {
+            cashBackButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Intent i = PaymentFlowActivity.intent(getApplicationContext());
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AbstractSpireMenuActivity.this);
+                    //just simple way how to display data into the list
+                    builder.setItems(menu, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (menu[which].equals(rupayCAP)) {
+                                i.putExtra(BaseActivity.CASH_BACK, AcceptSDK.CashBack.rupayCashBack.getValue());
+                                startActivity(i);
+                            }
+                            else if (menu[which].equals(masterAndVisaPWCB)) {
+                                i.putExtra(BaseActivity.CASH_BACK, AcceptSDK.CashBack.masterVisaCashBack.getValue());
+                                startActivity(i);
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+            });
+        }
         //additional feature only for Spire(thyron) terminals
         Button configUpdateButton = (Button) findViewById(R.id.configUpdate);
         if (configUpdateButton != null)

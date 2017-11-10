@@ -62,7 +62,7 @@ public class ConfigurationAndFirmwareUpdateActivity extends BaseActivity impleme
         });
         firmwareUpdateAlowedMode = getIntent().getExtras().getBoolean(ConfigurationAndFirmwareUpdateActivity.EXTRA_ITS_FIRMWARE_UPDATE_ALOWED, true);
 
-        controller = new AcceptThyronPaymentFlowController(((Application) getApplicationContext()).usb);
+        controller = new AcceptThyronPaymentFlowController(true, false,((Application) getApplicationContext()).usb);
         currentDev = getIntent().getExtras().getParcelable(ConfigurationAndFirmwareUpdateActivity.EXTRA_SELECTED_DEVICE);
         setResult(RESULT_CANCELED);
     }

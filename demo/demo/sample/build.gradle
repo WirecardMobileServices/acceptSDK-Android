@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     jcenter()
+    maven { url "https://maven.google.com" }
     maven { url "https://jitpack.io" }
     flatDir {
         dirs 'libs'
@@ -15,8 +16,8 @@ android {
         applicationId "de.wirecard.accept.sample"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 12
-        versionName "1.12.0"
+        versionCode 14
+        versionName "1.14.0"
     }
     packagingOptions {
         exclude 'META-INF/notice.txt'
@@ -74,18 +75,13 @@ android {
 }
 
 dependencies {
-//    compile 'com.github.mposSVK:acceptSDK-Android:1.5.10.2'
-//    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.5.4'
-//    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9.2'
-//    flavor_thyronUsbCompile 'com.github.mposSVK:accept-android-extension-spire:1.5.9.2'
+    compile 'com.github.mposSVK:acceptSDK-Android:1.6.0'
+    flavor_bbposCompile 'com.github.mposSVK:accept-android-extension-bbpos:1.6.0'
+    flavor_thyronCompile 'com.github.mposSVK:accept-android-extension-spire:1.6.0'
+    flavor_thyronUsbCompile 'com.github.mposSVK:accept-android-extension-spire:1.6.0'
 
-    compile(name: 'accept-sdk-android-acceptsdksource-release', ext: 'aar')
-    flavor_thyronCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
-    flavor_thyronUsbCompile(name: 'accept-sdk-android-thyronextension-release', ext: 'aar')
-    flavor_bbposCompile (name: 'accept-sdk-android-bbposextension-release', ext: 'aar')
-
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
+    compile 'com.android.support:design:25.4.0'
 
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'

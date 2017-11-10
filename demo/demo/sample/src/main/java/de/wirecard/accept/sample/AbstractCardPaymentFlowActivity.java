@@ -32,22 +32,44 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
     protected Device currentDevice;
     private Bitmap signature;
 
+    /**
+     * Idea is to have one payment flov for all terminals / flavours, and for different flavour is different instance of controller required
+     * @return PaymentFlowController
+     */
     abstract PaymentFlowController createNewController();
 
+    /**
+     * check implementation in PaymentFlowActivity, is different per flavour (SPm2 , BBPos)
+     * In case of Thyron flavour is confirmation solved locally in terminal
+     * BBpos is having solution supported locally in app, because its missing buttons.
+     * @return
+     */
     abstract boolean isSignatureConfirmationInApplication();
 
+    /**
+     * check implementation in PaymentFlowActivity, is different per flavour (SPm2 , BBPos)
+     * in case of BBPos is required (Thyron flavour is not needed)
+     * @return
+     */
     abstract boolean isRequiredPermissionOnStart();
 
+    /**
+     * check implementation in PaymentFlowActivity, is different per flavour (SPm2 , BBPos)
+     * @return
+     */
     abstract PaymentFlowController.DiscoverDelegate getDiscoverDelegate();
 
+    /**
+     * check implementation in PaymentFlowActivity, is different per flavour (SPm2 , BBPos)
+     * @param device
+     * @param amount
+     * @throws IllegalStateException
+     */
     abstract void startPaymentFlow(Device device, long amount) throws IllegalStateException;
 
-    public Boolean getSepa() {
+    public Boolean isSepa() {
         return sepa;
     }
-
-    protected int RECORD_RESPONSE_CODE = 111;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +122,9 @@ public abstract class AbstractCardPaymentFlowActivity extends AbstractPaymentFlo
         //and finally start pay( with given device, pay specified units in chosen currency)
         try {
             // required call start payment on controller
-            // paymentFlowController.startPaymentFlow(device, amount, getAmountCurrency(), this);
+            //therefore using local method
             startPaymentFlow(device, amountUnits);
+            //which is calling  paymentFlowController.startPaymentFlow(device, amount, getAmountCurrency(), this);
             //in case its bbpos solution we are not supporting cashback therefore is here this abstraction used
         } catch (IllegalStateException e) {
             e.printStackTrace();

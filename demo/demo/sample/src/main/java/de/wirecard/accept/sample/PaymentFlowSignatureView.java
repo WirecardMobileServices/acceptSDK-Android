@@ -88,10 +88,12 @@ public class PaymentFlowSignatureView extends View {
     }
 
     public byte[] compressSignatureBitmapToPNG() {
-        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(signatureBitmap, signatureBitmap.getWidth()/2, signatureBitmap.getHeight()/2, true);
+        if (signatureBitmap == null)
+            return null;
+        final Bitmap scaledBitmap = Bitmap.createScaledBitmap(signatureBitmap, signatureBitmap.getWidth() / 2, signatureBitmap.getHeight() / 2, true);
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        final byte[] result =  outputStream.toByteArray();
+        final byte[] result = outputStream.toByteArray();
         return result;
     }
 

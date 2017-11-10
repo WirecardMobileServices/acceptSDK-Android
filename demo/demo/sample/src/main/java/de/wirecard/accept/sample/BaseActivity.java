@@ -21,7 +21,7 @@ public class BaseActivity extends AppCompatActivity/*Activity*/ {
 
     public final static String SEPA = "sepa";
     public final static String CURRENT_DEVICE = "currentUsedDevice";
-    public final static String CASH_BACK = "cash_back";
+    public final static String CASH_BACK = "cashBack";
 
     public final static int TYPE_LOGOUT = 1;
     private boolean doubleBackToExitPressedOnce;

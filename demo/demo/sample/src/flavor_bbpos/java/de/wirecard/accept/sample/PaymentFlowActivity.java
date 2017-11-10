@@ -18,6 +18,9 @@ import de.wirecard.accept.sdk.extensions.PaymentFlowController;
 
 public class PaymentFlowActivity extends AbstractCardPaymentFlowActivity {
 
+
+    protected int RECORD_RESPONSE_CODE = 111;
+
     @Override
     PaymentFlowController createNewController() {
         return new AcceptBbposPaymentFlowController(this);
