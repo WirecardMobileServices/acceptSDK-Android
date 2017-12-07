@@ -2,7 +2,7 @@
 
 <img src="https://raw.githubusercontent.com/mposSVK/acceptSDK/master/docs/logo.png" alt="acceptSDK" width=240 height=95>
 
-[![CI Status](http://img.shields.io/travis/mposSVK/acceptSDK-Android.svg)](https://travis-ci.org/mposSVK/acceptSDK-Android)
+[![CI Status](http://img.shields.io/travis/WirecardMobileServices/acceptSDK-Android.svg)](https://travis-ci.org/WirecardMobileServices/acceptSDK-Android)
 [![Version](https://jitpack.io/v/mposSVK/acceptSDK-Android.svg)](https://jitpack.io/#mposSVK/acceptSDK-Android)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform: Android](https://img.shields.io/badge/platform-Android-green.svg)](https://img.shields.io/badge/platform-Android-green.svg)
