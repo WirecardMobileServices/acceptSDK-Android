@@ -1,8 +1,8 @@
 # accept-sdk-android
 
-<img src="https://raw.githubusercontent.com/mposSVK/acceptSDK/master/docs/logo.png" alt="acceptSDK" width=240 height=95>
+<img src="https://raw.githubusercontent.com/WirecardMobileServices/acceptSDK/master/docs/logo.png" alt="acceptSDK" width=240 height=95>
 
-[![CI Status](http://img.shields.io/travis/mposSVK/acceptSDK-Android.svg)](https://travis-ci.org/mposSVK/acceptSDK-Android)
+[![CI Status](http://img.shields.io/travis/WirecardMobileServices/acceptSDK-Android.svg)](https://travis-ci.org/WirecardMobileServices/acceptSDK-Android)
 [![Version](https://jitpack.io/v/mposSVK/acceptSDK-Android.svg)](https://jitpack.io/#mposSVK/acceptSDK-Android)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Platform: Android](https://img.shields.io/badge/platform-Android-green.svg)](https://img.shields.io/badge/platform-Android-green.svg)
@@ -32,7 +32,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
 	compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
     compile 'org.apache.httpcomponents:httpmime:4.3.5'
-	compile 'com.github.mposSVK:acceptSDK-Android:1.6.1'
+	compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.1'
 }
 ```
 
