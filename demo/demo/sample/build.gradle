@@ -75,7 +75,7 @@ android {
 }
 
 dependencies {
-    compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.2'
+    compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.3'
     flavor_bbposCompile 'com.github.WirecardMobileServices:accept-android-extension-bbpos:1.6.2'
     flavor_thyronCompile 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.2'
     flavor_thyronUsbCompile 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.2'
