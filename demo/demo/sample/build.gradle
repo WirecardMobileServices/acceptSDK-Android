@@ -10,16 +10,17 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "de.wirecard.accept.sample"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 17
-        versionName "1.14.4"
+        targetSdkVersion 26
+        versionCode 18
+        versionName "1.14.5"
     }
     packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license.txt'
         exclude 'META-INF/LICENSE'
@@ -30,17 +31,23 @@ android {
 
     }
 
+    useLibrary 'org.apache.http.legacy'
+    flavorDimensions "terminal"
+
     productFlavors {
         flavor_thyron {
             applicationId 'de.wirecard.accept.sample.thyron'
+            dimension "terminal"
         }
 
         flavor_thyronUsb {
             applicationId 'de.wirecard.accept.sample.usb'
+            dimension "terminal"
         }
 
         flavor_bbpos {
             applicationId 'de.wirecard.accept.sample.bbpos'
+            dimension "terminal"
         }
     }
 
@@ -67,27 +74,22 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(output.outputFile.parent, output.outputFile.name.replace(".apk", "-" + defaultConfig.versionName + ".apk"))
+        variant.outputs.all {
+            outputFileName = "${variant.name}-${variant.versionName}.apk"
         }
     }
 
 }
 
 dependencies {
-    compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.3'
-    flavor_bbposCompile 'com.github.WirecardMobileServices:accept-android-extension-bbpos:1.6.2'
-    flavor_thyronCompile 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.2'
-    flavor_thyronUsbCompile 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.2'
+    implementation 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.4'
+    flavor_bbposImplementation 'com.github.WirecardMobileServices:accept-android-extension-bbpos:1.6.3'
+    flavor_thyronImplementation 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.3'
+    flavor_thyronUsbImplementation 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.3'
 
-    compile 'com.android.support:appcompat-v7:25.4.0'
-    compile 'com.android.support:design:25.4.0'
-
-    compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
-    compile 'org.apache.httpcomponents:httpmime:4.3.5'
-
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.3'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.journeyapps:zxing-android-embedded:3.5.0'
-    compile 'com.scottyab:rootbeer-lib:0.0.6'
+    implementation 'com.android.support:appcompat-v7:26.0.2'
+    implementation 'com.android.support:design:26.0.2'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
+    implementation 'com.scottyab:rootbeer-lib:0.0.6'
 }

@@ -53,6 +53,8 @@ class Receipt {
         appendPaymentDetails(sb, p);
         sb.append('\n');
         sb.appendWithNextLine("Payment issued by accept by Wirecard");
+        sb.append('\n');
+        sb.appendWithNextLine("App version: "+  BuildConfig.FLAVOR + " version "+ BuildConfig.VERSION_NAME + "(ver.code " +BuildConfig.VERSION_CODE+ ")");
 
 
         FrameLayout receiptView = (FrameLayout) LayoutInflater.from(context).inflate(R.layout.dialog_receipt, null);
@@ -75,6 +77,7 @@ class Receipt {
     }
 
     private void appendMerchantInfo(MyStringBuilder sb) {
+        sb.appendWithNextLine("Merchant: ");
         final String name = ReceiptBuilder.getMerchantNameAndSurname();
         final String address1 = ReceiptBuilder.getMerchantAddressLine1();
         final String address2 = ReceiptBuilder.getMerchantAddressLine2();
@@ -124,10 +127,22 @@ class Receipt {
         sb.append("Transaction type: \t\t");
         sb.appendWithNextLine(p.getTransactionTypeString().toUpperCase());
 
-        if (p.getTransactionType() != AcceptSDK.TransactionType.CASH_PAYMENT) {
-            sb.append("Card Type: \t\t");
-            sb.appendWithNextLine(ReceiptBuilder.getCardTypeForReceipt(p));
+        String  acquirer = ReceiptBuilder.getAcquirerLabel(p);
+        if(!TextUtils.isEmpty(acquirer)) {
+            sb.append("Acquirer : \t\t");
+            sb.appendWithNextLine(acquirer);
+        }
 
+        if (p.getTransactionType() != AcceptSDK.TransactionType.CASH_PAYMENT) {
+            String cardType = ReceiptBuilder.getCardTypeForReceipt(p);
+            sb.append("Card Type: \t\t");
+            sb.appendWithNextLine(cardType);
+
+            if (!TextUtils.isEmpty(cardType) && (cardType.toLowerCase().contains("diner") || cardType.toLowerCase().contains("discover"))) {
+                //in Case its primary rupay currency application, use this method for fix new bin ranges identification
+                sb.append("Card Type rupay fix: \t\t");
+                sb.appendWithNextLine(ReceiptBuilder.getCardTypeForReceiptIfRupayFixingDinersDiscoverLabel(p));
+            }
             sb.append("Card Payment method: \t\t");
             sb.appendWithNextLine(ReceiptBuilder.getCardPaymentMethod(p, context));
 
