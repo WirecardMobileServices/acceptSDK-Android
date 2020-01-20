@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.4'
+    compile 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.5'
 }
 ```
 
@@ -48,6 +48,7 @@ SDK|Spire extension|BBPos extension|
 1.6.2|1.6.2|1.6.2|
 1.6.3|1.6.2|1.6.2|
 1.6.4|1.6.3|1.6.3|
+1.6.5|1.6.3|1.6.3|
 
 ## Contact
 Get in touch with [acceptSDK development team](mailto://mpos-svk@wirecard.com "acceptSDK") for acceptSDK support and mPOS Whitelabel solution

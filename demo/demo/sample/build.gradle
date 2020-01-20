@@ -16,8 +16,8 @@ android {
         applicationId "de.wirecard.accept.sample"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 18
-        versionName "1.14.5"
+        versionCode 19
+        versionName "1.14.6"
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -82,7 +82,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.4'
+    implementation 'com.github.WirecardMobileServices:acceptSDK-Android:1.6.5'
     flavor_bbposImplementation 'com.github.WirecardMobileServices:accept-android-extension-bbpos:1.6.3'
     flavor_thyronImplementation 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.3'
     flavor_thyronUsbImplementation 'com.github.WirecardMobileServices:accept-android-extension-spire:1.6.3'
